@@ -13,8 +13,11 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', 'edupilot-fallback-secret-key')
     APP_NAME = os.environ.get('APP_NAME', 'EduPilot')
 
-    # Database
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', 'sqlite:///edupilot.db')
+    # Database – Render provides postgres:// but SQLAlchemy requires postgresql://
+    _db_url = os.environ.get('DATABASE_URL', 'sqlite:///edupilot.db')
+    if _db_url.startswith('postgres://'):
+        _db_url = _db_url.replace('postgres://', 'postgresql://', 1)
+    SQLALCHEMY_DATABASE_URI = _db_url
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # IBM Watsonx.ai
@@ -34,7 +37,7 @@ class Config:
 
     # File uploads
     MAX_CONTENT_LENGTH = 5 * 1024 * 1024  # 5MB
-    UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'static', 'uploads')
+    UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads')
 
 
 class DevelopmentConfig(Config):
