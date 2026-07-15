@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title %}Achievements – EduPilot{% endblock %}
+{% block page_title %}Achievements & Badges{% endblock %}
+
+{% block content %}
+{% set all_badges = [
+  ('First Chat', 'bi-chat-heart', '#FF6B6B', 'Started your first conversation with Aria!'),
+  ('Profile Master', 'bi-person-check', '#4ECDC4', 'Completed 80%+ of your profile'),
+  ('Roadmap Explorer', 'bi-map', '#45B7D1', 'Generated your first learning roadmap!'),
+  ('Assessment Taker', 'bi-pencil-square', '#BB8FCE', 'Completed your first skill assessment!'),
+  ('Assessment Ace', 'bi-patch-exclamation-fill', '#FFD700', 'Scored 80%+ on an assessment!'),
+  ('First Steps', 'bi-footprints', '#F7DC6F', 'Completed 25% of your roadmap'),
+  ('Halfway Hero', 'bi-star-half', '#FF6B6B', 'Completed 50% of your roadmap'),
+  ('Roadmap Champion', 'bi-trophy-fill', '#FFD700', 'Completed 100% of your roadmap!'),
+] %}
+
+{# Build set of earned badge names #}
+{% set earned_names = [] %}
+{% for badge in earned_badges %}
+  {% if earned_names.append(badge.badge_name) %}{% endif %}
+{% endfor %}
+
+<div class="row g-4">
+  <!-- Stats -->
+  <div class="col-md-4">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(255,215,0,0.1);color:#FFD700;"><i class="bi bi-trophy-fill"></i></div>
+      <div class="stat-body">
+        <div class="stat-value">{{ current_user.achievements.count() }}</div>
+        <div class="stat-label">Badges Earned</div>
+        <div class="stat-change positive"><i class="bi bi-stars"></i> Out of {{ all_badges|length }} total</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <div class="glass-card">
+      <div class="glass-card-body">
+        <div class="section-title mb-4">
+          <div class="title-icon" style="background:linear-gradient(135deg,#FFB347,#FF6B6B);"><i class="bi bi-award"></i></div>
+          All Badges
+        </div>
+
+        <div class="row g-3">
+          {% for name, icon, color, desc in all_badges %}
+          {% set earned = None %}
+          {% for badge in earned_badges %}
+            {% if badge.badge_name == name %}{% set earned = badge %}{% endif %}
+          {% endfor %}
+
+          <div class="col-6 col-md-4 col-lg-3">
+            <div class="badge-card {{ 'earned' if earned else 'locked' }}"
+                 style="{% if earned %}border-color:{{ color }}44;background:{{ color }}08;{% endif %}">
+              <div class="badge-icon-wrap" style="background:{% if earned %}{{ color }}22{% else %}var(--border){% endif %};">
+                <i class="bi {{ icon }}" style="color:{% if earned %}{{ color }}{% else %}var(--text-muted){% endif %};"></i>
+              </div>
+              <div style="font-weight:700;font-size:.85rem;color:{% if earned %}var(--text){% else %}var(--text-muted){% endif %};margin-bottom:4px;">
+                {{ name }}
+                {% if not earned %}<i class="bi bi-lock-fill" style="font-size:.65rem;margin-left:4px;"></i>{% endif %}
+              </div>
+              <div style="font-size:.72rem;color:var(--text-muted);line-height:1.4;">{{ desc }}</div>
+              {% if earned %}
+              <div style="margin-top:8px;font-size:.7rem;color:{{ color }};font-weight:600;">
+                ✓ Earned {{ earned.earned_at.strftime('%b %d, %Y') if earned.earned_at else '' }}
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

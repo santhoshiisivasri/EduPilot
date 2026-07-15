@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+{% block title %}Settings – EduPilot{% endblock %}
+{% block page_title %}Settings{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-8">
+
+    <!-- Appearance Settings -->
+    <div class="glass-card mb-4">
+      <div class="glass-card-body">
+        <div class="section-title mb-4">
+          <div class="title-icon"><i class="bi bi-palette"></i></div>
+          Appearance
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--border);">
+          <div>
+            <div style="font-weight:600;font-size:.9rem;">Dark Mode</div>
+            <div style="color:var(--text-muted);font-size:.8rem;margin-top:2px;">Toggle between light and dark themes</div>
+          </div>
+          <label style="position:relative;width:52px;height:28px;cursor:pointer;">
+            <input type="checkbox" id="darkModeToggle" {% if current_user.profile and current_user.profile.dark_mode %}checked{% endif %}
+                   onchange="toggleDarkMode()" style="opacity:0;position:absolute;" />
+            <div style="position:absolute;inset:0;background:var(--border);border-radius:20px;transition:.3s;"></div>
+            <div style="position:absolute;width:22px;height:22px;border-radius:50%;background:white;top:3px;left:3px;transition:.3s;box-shadow:0 2px 6px rgba(0,0,0,0.2);" id="toggleThumb"></div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notifications -->
+    <div class="glass-card mb-4">
+      <div class="glass-card-body">
+        <div class="section-title mb-4">
+          <div class="title-icon"><i class="bi bi-bell"></i></div>
+          Notifications
+        </div>
+
+        {% for label, desc, key in [
+          ('Email Notifications', 'Receive weekly progress summaries via email', 'email'),
+          ('Milestone Alerts', 'Get notified when you complete a milestone', 'milestone'),
+          ('Study Reminders', 'Daily reminders to keep your streak alive', 'reminder'),
+        ] %}
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);">
+          <div>
+            <div style="font-weight:600;font-size:.9rem;">{{ label }}</div>
+            <div style="color:var(--text-muted);font-size:.8rem;margin-top:2px;">{{ desc }}</div>
+          </div>
+          <label style="position:relative;width:52px;height:28px;cursor:pointer;">
+            <input type="checkbox" checked style="opacity:0;position:absolute;" />
+            <div style="position:absolute;inset:0;background:var(--gradient-primary);border-radius:20px;transition:.3s;"></div>
+            <div style="position:absolute;width:22px;height:22px;border-radius:50%;background:white;top:3px;left:27px;transition:.3s;box-shadow:0 2px 6px rgba(0,0,0,0.2);"></div>
+          </label>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Account Settings -->
+    <div class="glass-card mb-4">
+      <div class="glass-card-body">
+        <div class="section-title mb-4">
+          <div class="title-icon"><i class="bi bi-shield-lock"></i></div>
+          Account & Security
+        </div>
+
+        <div style="padding:14px 0;border-bottom:1px solid var(--border);">
+          <div style="font-size:.85rem;color:var(--text-muted);margin-bottom:4px;">Email</div>
+          <div style="font-weight:600;">{{ current_user.email }}</div>
+        </div>
+
+        <div style="padding:14px 0;border-bottom:1px solid var(--border);">
+          <div style="font-size:.85rem;color:var(--text-muted);margin-bottom:4px;">Username</div>
+          <div style="font-weight:600;">{{ current_user.username }}</div>
+        </div>
+
+        <div style="padding:14px 0;border-bottom:1px solid var(--border);">
+          <div style="font-size:.85rem;color:var(--text-muted);margin-bottom:4px;">Member Since</div>
+          <div style="font-weight:600;">{{ current_user.created_at.strftime('%B %d, %Y') if current_user.created_at else 'N/A' }}</div>
+        </div>
+
+        <div style="margin-top:16px;display:flex;gap:12px;">
+          <button class="btn-gradient-outline" style="padding:8px 20px;font-size:.85rem;">
+            <i class="bi bi-key"></i> Change Password
+          </button>
+          <a href="{{ url_for('profile.view') }}" class="btn-gradient" style="padding:8px 20px;font-size:.85rem;">
+            <i class="bi bi-pencil"></i> Edit Profile
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Danger Zone -->
+    <div class="glass-card" style="border-color:rgba(255,71,87,0.3) !important;">
+      <div class="glass-card-body">
+        <div class="section-title mb-4" style="color:var(--danger);">
+          <div class="title-icon" style="background:rgba(255,71,87,0.1);"><i class="bi bi-exclamation-triangle" style="color:var(--danger);"></i></div>
+          Danger Zone
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <div style="font-weight:600;font-size:.875rem;">Clear Chat History</div>
+            <div style="color:var(--text-muted);font-size:.8rem;">Delete all your AI chat conversations</div>
+          </div>
+          <button onclick="clearChatHistory()" class="btn" style="background:rgba(255,71,87,0.1);color:var(--danger);border:1px solid rgba(255,71,87,0.2);border-radius:50px;padding:8px 16px;font-size:.8rem;font-weight:600;">
+            <i class="bi bi-trash3"></i> Clear
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Right: IBM Watsonx Info -->
+  <div class="col-lg-4">
+    <div class="glass-card mb-4" style="background:linear-gradient(135deg,rgba(26,42,108,0.9),rgba(63,43,150,0.9));border:1px solid rgba(108,99,255,0.3);">
+      <div class="glass-card-body" style="color:white;text-align:center;">
+        <div style="font-size:2.5rem;margin-bottom:12px;">🔵</div>
+        <h3 style="font-family:var(--font-display);font-weight:800;font-size:1.1rem;margin-bottom:8px;">IBM Watsonx.ai</h3>
+        <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:12px;margin-bottom:12px;text-align:left;">
+          <div style="font-size:.75rem;margin-bottom:6px;opacity:.7;">Model</div>
+          <div style="font-size:.85rem;font-weight:600;">granite-4-h-small</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:12px;text-align:left;">
+          <div style="font-size:.75rem;margin-bottom:6px;opacity:.7;">Status</div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <div style="width:8px;height:8px;background:#2ED573;border-radius:50%;animation:pulse-glow 2s infinite;"></div>
+            <span style="font-size:.85rem;font-weight:600;color:#2ED573;">Connected</span>
+          </div>
+        </div>
+        <p style="font-size:.75rem;opacity:.6;margin-top:12px;">AI is powering your personalized learning experience via IBM Cloud.</p>
+      </div>
+    </div>
+
+    <div class="glass-card">
+      <div class="glass-card-body">
+        <div class="section-title mb-3">
+          <div class="title-icon"><i class="bi bi-info-circle"></i></div>
+          About EduPilot
+        </div>
+        <div style="font-size:.82rem;color:var(--text-secondary);line-height:1.7;">
+          <p><strong>EduPilot</strong> is an AI-powered personalized learning platform built for the IBM Hackathon.</p>
+          <p>It uses <strong>IBM Watsonx.ai Granite</strong> models to provide intelligent, adaptive career guidance and learning roadmaps.</p>
+        </div>
+        <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:.75rem;color:var(--text-muted);">
+          Version 1.0.0 · IBM Hackathon 2024
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function clearChatHistory() {
+  if (!confirm('Are you sure you want to clear your entire chat history? This cannot be undone.')) return;
+  try {
+    const resp = await fetch('/chat/clear', { method: 'POST' });
+    if (resp.ok) alert('✅ Chat history cleared!');
+  } catch (e) {
+    alert('Error clearing chat history.');
+  }
+}
+</script>
+{% endblock %}

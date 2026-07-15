@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EduPilot – AI-Powered Personalized Learning Platform</title>
+  <meta name="description" content="EduPilot uses IBM Watsonx.ai Granite to create your personalized tech learning roadmap. Master Frontend, AI, Data Science, Cybersecurity, and 12+ domains with your AI coach." />
+  <meta name="keywords" content="AI learning, personalized roadmap, IBM Watsonx, tech career, coding bootcamp, data science, web development" />
+  <link rel="canonical" href="/" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="EduPilot – Your AI Learning Coach" />
+  <meta property="og:description" content="Personalized tech learning roadmaps powered by IBM Watsonx.ai" />
+  <meta property="og:type" content="website" />
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <!-- EduPilot CSS -->
+  <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" />
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="landing-nav" id="landingNav">
+  <div class="container">
+    <div class="d-flex align-items-center justify-content-between">
+      <a href="/" class="nav-brand">
+        <div class="nav-brand-icon">
+          <i class="bi bi-mortarboard-fill"></i>
+        </div>
+        <span class="nav-brand-text">EduPilot</span>
+      </a>
+
+      <div class="d-none d-md-flex align-items-center gap-4">
+        <a href="#features" class="text-white-50 text-decoration-none" style="font-size:.9rem;font-weight:500;">Features</a>
+        <a href="#domains" class="text-white-50 text-decoration-none" style="font-size:.9rem;font-weight:500;">Domains</a>
+        <a href="#testimonials" class="text-white-50 text-decoration-none" style="font-size:.9rem;font-weight:500;">Testimonials</a>
+        <a href="#faq" class="text-white-50 text-decoration-none" style="font-size:.9rem;font-weight:500;">FAQ</a>
+      </div>
+
+      <div class="d-flex align-items-center gap-3">
+        <a href="{{ url_for('auth.login') }}" class="btn-gradient-outline" style="border-color:rgba(255,255,255,0.3);color:white;">Login</a>
+        <a href="{{ url_for('auth.register') }}" class="btn-gradient">Get Started Free</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="landing-hero" id="home">
+  <div class="hero-bg-orb orb-1"></div>
+  <div class="hero-bg-orb orb-2"></div>
+  <div class="hero-bg-orb orb-3"></div>
+
+  <div class="container">
+    <div class="row align-items-center g-5">
+      <!-- Left: Copy -->
+      <div class="col-lg-6 hero-content">
+        <div class="hero-badge animate-fade-up">
+          <i class="bi bi-stars" style="color: #FFB347;"></i>
+          Powered by IBM Watsonx.ai Granite
+        </div>
+
+        <h1 class="hero-title animate-fade-up stagger-1">
+          Your <span class="gradient-word">AI-Powered</span><br />
+          Learning Coach<br />
+          <span class="gradient-word">Awaits You</span>
+        </h1>
+
+        <p class="hero-subtitle animate-fade-up stagger-2">
+          EduPilot creates a fully personalized tech learning roadmap just for you — powered by IBM Granite AI. Get custom career guidance, skill assessments, weekly plans, and a mentor that never sleeps.
+        </p>
+
+        <div class="hero-cta animate-fade-up stagger-3">
+          <a href="{{ url_for('auth.register') }}" class="btn-gradient" style="padding:14px 36px;font-size:1rem;">
+            <i class="bi bi-rocket-takeoff"></i>
+            Start Learning Free
+          </a>
+          <a href="#features" class="btn-gradient-outline" style="border-color:rgba(255,255,255,0.3);color:white;padding:12px 28px;font-size:1rem;">
+            <i class="bi bi-play-circle"></i>
+            See How It Works
+          </a>
+        </div>
+
+        <div class="hero-stats animate-fade-up stagger-4">
+          <div>
+            <div class="hero-stat-value">12+</div>
+            <div class="hero-stat-label">Career Domains</div>
+          </div>
+          <div>
+            <div class="hero-stat-value">AI</div>
+            <div class="hero-stat-label">Powered Coach</div>
+          </div>
+          <div>
+            <div class="hero-stat-value">100%</div>
+            <div class="hero-stat-label">Personalized</div>
+          </div>
+          <div>
+            <div class="hero-stat-value">Free</div>
+            <div class="hero-stat-label">To Get Started</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Visual Cards -->
+      <div class="col-lg-6 hero-visual">
+        <div class="row g-3">
+          <!-- Main AI Card -->
+          <div class="col-12">
+            <div class="hero-card-float animate-fade-up stagger-1">
+              <div class="d-flex align-items-center gap-3 mb-3">
+                <div style="width:44px;height:44px;border-radius:12px;background:var(--gradient-primary);display:flex;align-items:center;justify-content:center;font-size:1.3rem;">🤖</div>
+                <div>
+                  <div style="font-weight:700;font-size:.95rem;">Aria – Your AI Coach</div>
+                  <div style="font-size:.75rem;opacity:.6;">IBM Watsonx.ai Granite</div>
+                </div>
+                <div style="margin-left:auto;display:flex;gap:4px;">
+                  <div style="width:6px;height:6px;background:#2ED573;border-radius:50%;animation:pulse-glow 2s infinite;"></div>
+                  <span style="font-size:.7rem;color:#2ED573;font-weight:600;">Live</span>
+                </div>
+              </div>
+              <div style="background:rgba(108,99,255,0.15);border-radius:12px;padding:14px;font-size:.85rem;line-height:1.6;border-left:3px solid var(--primary);">
+                "👋 Hi! I'm Aria, your EduPilot AI coach. Tell me your career goal and I'll build you a personalized learning roadmap from beginner to job-ready! 🚀"
+              </div>
+            </div>
+          </div>
+
+          <!-- Roadmap Preview -->
+          <div class="col-6">
+            <div class="hero-card-float delay-1" style="padding:16px;">
+              <div style="font-size:.75rem;font-weight:600;opacity:.6;margin-bottom:10px;">YOUR ROADMAP</div>
+              {% for level, color, pct in [('Beginner', '#2ED573', 100), ('Intermediate', '#6C63FF', 45), ('Advanced', '#FF6B9D', 10)] %}
+              <div style="margin-bottom:8px;">
+                <div class="d-flex justify-content-between" style="font-size:.72rem;margin-bottom:3px;">
+                  <span>{{ level }}</span><span>{{ pct }}%</span>
+                </div>
+                <div style="height:5px;background:rgba(255,255,255,0.1);border-radius:3px;">
+                  <div style="width:{{ pct }}%;height:100%;background:{{ color }};border-radius:3px;"></div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Career Score -->
+          <div class="col-6">
+            <div class="hero-card-float delay-2" style="padding:16px;text-align:center;">
+              <div style="font-size:.75rem;font-weight:600;opacity:.6;margin-bottom:8px;">CAREER READINESS</div>
+              <div style="font-size:2.5rem;font-weight:900;background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">87%</div>
+              <div style="font-size:.75rem;opacity:.7;margin-top:4px;">Almost Job Ready! 🎉</div>
+              <div style="margin-top:10px;">
+                {% for i in range(5) %}
+                <i class="bi bi-star-fill" style="color:#FFB347;font-size:.8rem;"></i>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Trusted By / Powered By -->
+<section style="background:rgba(255,255,255,0.02);border-top:1px solid rgba(255,255,255,0.07);border-bottom:1px solid rgba(255,255,255,0.07);padding:28px 0;">
+  <div class="container">
+    <p style="text-align:center;font-size:.8rem;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:.15em;margin-bottom:20px;font-weight:600;">Powered By</p>
+    <div class="d-flex flex-wrap justify-content-center align-items-center gap-5">
+      {% for tech, icon in [('IBM Watsonx.ai', 'bi-cpu'), ('IBM Granite', 'bi-robot'), ('Python Flask', 'bi-code-slash'), ('Bootstrap 5', 'bi-bootstrap'), ('Chart.js', 'bi-bar-chart')] %}
+      <div class="d-flex align-items-center gap-2" style="color:rgba(255,255,255,0.45);font-size:.9rem;font-weight:600;">
+        <i class="bi {{ icon }}" style="font-size:1.3rem;color:rgba(108,99,255,0.7);"></i>
+        {{ tech }}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-5" id="features" style="background:rgba(10,10,26,0.9);">
+  <div class="container py-4">
+    <div class="text-center mb-5">
+      <div class="hero-badge d-inline-flex mx-auto mb-3">
+        <i class="bi bi-lightning-charge-fill"></i> Core Features
+      </div>
+      <h2 style="font-family:var(--font-display);font-size:2.5rem;font-weight:800;color:white;">
+        Everything You Need to<br /><span style="background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Accelerate Your Career</span>
+      </h2>
+    </div>
+
+    <div class="row g-4">
+      {% set features = [
+        ('bi-robot', 'var(--gradient-primary)', 'AI Learning Coach', 'Chat with Aria, your IBM Granite AI mentor. Get personalized advice, roadmaps, and answers 24/7.'),
+        ('bi-map', 'var(--gradient-cool)', 'Personalized Roadmaps', 'AI-generated learning paths from beginner to job-ready for 12+ tech domains.'),
+        ('bi-clipboard-check', 'var(--gradient-warm)', 'Skill Assessment', 'Take AI-evaluated quizzes to identify skill gaps and get targeted recommendations.'),
+        ('bi-bar-chart-line', 'var(--gradient-ocean)', 'Learning Analytics', 'Beautiful dashboards showing your progress, streaks, and career readiness score.'),
+        ('bi-calendar-week', 'var(--gradient-forest)', 'Weekly Study Planner', 'AI-generated weekly plans tailored to your available time and learning style.'),
+        ('bi-briefcase', 'var(--gradient-sunset)', 'Career Guidance', 'Get job role recommendations, salary insights, and interview prep guidance.'),
+        ('bi-trophy', 'linear-gradient(135deg,#FFB347,#FF6B6B)', 'Achievement Badges', 'Earn badges for milestones, keep your streak alive, and celebrate every win.'),
+        ('bi-graph-up-arrow', 'linear-gradient(135deg,#6C63FF,#2ED573)', 'Progress Tracking', 'Visual milestone tracking with heatmaps, progress rings, and completion stats.'),
+      ] %}
+      {% for icon, gradient, title, desc in features %}
+      <div class="col-md-6 col-lg-3">
+        <div class="glass-card h-100" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
+          <div class="glass-card-body">
+            <div class="feature-icon-wrap" style="background:{{ gradient }};opacity:0.9;">
+              <i class="bi {{ icon }}" style="color:white;font-size:1.6rem;"></i>
+            </div>
+            <h3 style="font-family:var(--font-display);font-size:1rem;font-weight:700;color:white;margin-bottom:8px;">{{ title }}</h3>
+            <p style="font-size:.85rem;color:rgba(255,255,255,0.55);line-height:1.6;margin:0;">{{ desc }}</p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Career Domains -->
+<section class="py-5" id="domains" style="background:rgba(8,8,20,0.95);">
+  <div class="container py-4">
+    <div class="text-center mb-5">
+      <div class="hero-badge d-inline-flex mx-auto mb-3">
+        <i class="bi bi-grid-3x3-gap-fill"></i> Career Tracks
+      </div>
+      <h2 style="font-family:var(--font-display);font-size:2.5rem;font-weight:800;color:white;">
+        12+ Career Domains<br /><span style="background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Covered by AI</span>
+      </h2>
+    </div>
+
+    <div class="row g-3">
+      {% for domain in career_domains %}
+      <div class="col-6 col-md-4 col-lg-2">
+        <a href="{{ url_for('auth.register') }}" class="text-decoration-none">
+          <div class="domain-card" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
+            <div class="domain-icon" style="background:{{ domain.color }}22;color:{{ domain.color }};">
+              <i class="bi {{ domain.icon }}" style="font-size:1.8rem;"></i>
+            </div>
+            <div style="font-size:.8rem;font-weight:700;color:white;margin-bottom:4px;">{{ domain.name }}</div>
+            <div style="font-size:.7rem;color:rgba(255,255,255,0.45);">{{ domain.avg_salary.split('–')[0].strip() }}+</div>
+            <div style="margin-top:10px;">
+              <span style="background:{{ domain.color }}22;color:{{ domain.color }};font-size:.65rem;font-weight:600;padding:3px 8px;border-radius:20px;">Explore →</span>
+            </div>
+          </div>
+        </a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- How It Works -->
+<section class="py-5" style="background:rgba(12,12,30,0.95);">
+  <div class="container py-4">
+    <div class="text-center mb-5">
+      <h2 style="font-family:var(--font-display);font-size:2.5rem;font-weight:800;color:white;">
+        How EduPilot <span style="background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Works</span>
+      </h2>
+    </div>
+    <div class="row g-4 text-center">
+      {% for step, icon, title, desc in [
+        ('01', 'bi-person-plus', 'Create Your Profile', 'Tell Aria about your background, goals, skills, and learning style.'),
+        ('02', 'bi-chat-dots', 'Chat With AI Coach', 'Have a conversation with Aria to define your learning goals and preferences.'),
+        ('03', 'bi-map', 'Get Your Roadmap', 'Receive an AI-generated personalized roadmap with resources, projects, and certs.'),
+        ('04', 'bi-graph-up', 'Track & Grow', 'Complete milestones, earn badges, and watch your career readiness score climb.'),
+      ] %}
+      <div class="col-md-6 col-lg-3">
+        <div style="color:rgba(108,99,255,0.6);font-size:3rem;font-weight:900;font-family:var(--font-display);line-height:1;">{{ step }}</div>
+        <div style="width:60px;height:60px;background:var(--gradient-primary);border-radius:18px;display:flex;align-items:center;justify-content:center;margin:12px auto;font-size:1.5rem;color:white;">
+          <i class="bi {{ icon }}"></i>
+        </div>
+        <h3 style="font-family:var(--font-display);font-size:1.1rem;font-weight:700;color:white;margin-bottom:8px;">{{ title }}</h3>
+        <p style="font-size:.85rem;color:rgba(255,255,255,0.5);line-height:1.6;">{{ desc }}</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section class="py-5" id="testimonials" style="background:rgba(10,10,26,0.9);">
+  <div class="container py-4">
+    <div class="text-center mb-5">
+      <h2 style="font-family:var(--font-display);font-size:2.5rem;font-weight:800;color:white;">
+        What <span style="background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Students Say</span>
+      </h2>
+    </div>
+    <div class="row g-4">
+      {% set testimonials = [
+        ('Riya S.', 'Computer Science Student', 'EduPilot\'s AI coach literally changed my life. I went from knowing just Python basics to landing a Data Science internship in 6 months!', '🇮🇳'),
+        ('Marcus J.', 'Career Switcher → Frontend Dev', 'As a complete beginner coming from marketing, I was overwhelmed. Aria created the perfect roadmap for me and kept me motivated every step.', '🇺🇸'),
+        ('Priya M.', 'Engineering Graduate', 'The skill assessment + roadmap combination is incredibly accurate. It identified my exact gaps and gave me a clear plan. Now I\'m a junior ML engineer!', '🇮🇳'),
+        ('Alex T.', 'High School Student → Dev', 'I started at 16 with no coding experience. EduPilot\'s Aria guided me through frontend development step by step. Just got my first freelance project!', '🇦🇺'),
+        ('Fatima K.', 'B.Tech → Cybersecurity', 'The weekly study planner helped me manage my study time alongside college. I passed my CompTIA Security+ on the first attempt!', '🇸🇦'),
+        ('James O.', 'Self-Taught Developer', 'The career guidance dashboard helped me understand exactly which jobs I was qualified for. Got 3 interview calls in my first week of applying!', '🇨🇦'),
+      ] %}
+      {% for name, role, quote, flag in testimonials %}
+      <div class="col-md-6 col-lg-4">
+        <div class="glass-card h-100" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);">
+          <div class="glass-card-body">
+            <div class="d-flex gap-1 mb-3">
+              {% for i in range(5) %}<i class="bi bi-star-fill" style="color:#FFB347;font-size:.85rem;"></i>{% endfor %}
+            </div>
+            <p style="font-size:.875rem;color:rgba(255,255,255,0.75);line-height:1.7;margin-bottom:20px;">"{{ quote }}"</p>
+            <div class="d-flex align-items-center gap-3">
+              <div style="width:42px;height:42px;border-radius:50%;background:var(--gradient-primary);display:flex;align-items:center;justify-content:center;font-size:1.3rem;">{{ flag }}</div>
+              <div>
+                <div style="font-weight:700;color:white;font-size:.875rem;">{{ name }}</div>
+                <div style="font-size:.75rem;color:rgba(255,255,255,0.45);">{{ role }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="py-5" id="faq" style="background:rgba(8,8,20,0.95);">
+  <div class="container py-4" style="max-width:800px;">
+    <div class="text-center mb-5">
+      <h2 style="font-family:var(--font-display);font-size:2.5rem;font-weight:800;color:white;">
+        Frequently Asked <span style="background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Questions</span>
+      </h2>
+    </div>
+    <div class="accordion" id="faqAccordion">
+      {% set faqs = [
+        ('What is EduPilot?', 'EduPilot is an AI-powered personalized learning platform that creates custom career roadmaps for tech learners. It\'s powered by IBM Watsonx.ai using the IBM Granite language model to provide intelligent, personalized guidance.'),
+        ('Do I need any prior coding experience?', 'Absolutely not! EduPilot works for complete beginners all the way to experienced developers looking to upskill. Your AI coach Aria will adapt the roadmap based on your current skill level.'),
+        ('How does the AI roadmap generation work?', 'When you complete your profile and chat with Aria, the IBM Granite model analyzes your goals, skills, experience level, and available study time to generate a structured beginner→intermediate→advanced roadmap with specific resources, projects, and certifications.'),
+        ('Is EduPilot free to use?', 'Yes! EduPilot\'s core features are completely free. You can register, create your profile, chat with Aria, generate roadmaps, take assessments, and track your progress at no cost.'),
+        ('Which career domains does EduPilot support?', 'EduPilot supports 12+ domains including Frontend Development, Backend Development, Full Stack, AI/ML, Data Science, Cybersecurity, Cloud Computing, UI/UX Design, DevOps, Mobile Development, Blockchain, and more.'),
+        ('How is my data protected?', 'Your data is stored securely in an encrypted database. We never share your personal information or learning data with third parties. Your conversations with Aria are private and only visible to you.'),
+      ] %}
+      {% for q, a in faqs %}
+      <div class="accordion-item" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px !important;margin-bottom:10px;overflow:hidden;">
+        <h2 class="accordion-header">
+          <button class="accordion-button {% if not loop.first %}collapsed{% endif %}" type="button"
+                  data-bs-toggle="collapse" data-bs-target="#faq{{ loop.index }}"
+                  style="background:transparent;color:white;font-weight:600;font-size:.9rem;box-shadow:none;border-radius:12px;">
+            {{ q }}
+          </button>
+        </h2>
+        <div id="faq{{ loop.index }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}" data-bs-parent="#faqAccordion">
+          <div class="accordion-body" style="color:rgba(255,255,255,0.65);font-size:.875rem;line-height:1.7;">
+            {{ a }}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5" style="background:var(--gradient-primary);position:relative;overflow:hidden;">
+  <div style="position:absolute;inset:0;background:url('data:image/svg+xml,...');opacity:.1;"></div>
+  <div class="container py-4 text-center position-relative">
+    <h2 style="font-family:var(--font-display);font-size:2.5rem;font-weight:900;color:white;margin-bottom:16px;">
+      Ready to Launch Your Tech Career?
+    </h2>
+    <p style="color:rgba(255,255,255,0.8);font-size:1.1rem;margin-bottom:36px;max-width:500px;margin-left:auto;margin-right:auto;">
+      Join thousands of learners who've transformed their careers with EduPilot's AI-powered guidance.
+    </p>
+    <a href="{{ url_for('auth.register') }}" class="btn btn-lg" style="background:white;color:var(--primary);font-weight:700;border-radius:50px;padding:14px 44px;font-family:var(--font-display);box-shadow:0 10px 30px rgba(0,0,0,0.2);transition:var(--transition);">
+      <i class="bi bi-rocket-takeoff me-2"></i>
+      Start Your Journey – It's Free
+    </a>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer style="background:#050510;border-top:1px solid rgba(255,255,255,0.06);padding:48px 0 24px;">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <div style="width:36px;height:36px;background:var(--gradient-primary);border-radius:10px;display:flex;align-items:center;justify-content:center;color:white;font-size:1.1rem;">
+            <i class="bi bi-mortarboard-fill"></i>
+          </div>
+          <span style="font-family:var(--font-display);font-size:1.3rem;font-weight:800;color:white;">EduPilot</span>
+        </div>
+        <p style="color:rgba(255,255,255,0.45);font-size:.875rem;line-height:1.7;">
+          AI-powered personalized learning platform built for the next generation of tech professionals. Powered by IBM Watsonx.ai Granite.
+        </p>
+        <div class="d-flex gap-3 mt-3">
+          {% for platform, icon in [('GitHub', 'bi-github'), ('Twitter', 'bi-twitter-x'), ('LinkedIn', 'bi-linkedin')] %}
+          <a href="#" style="width:36px;height:36px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.5);font-size:1rem;text-decoration:none;transition:var(--transition);"
+             onmouseover="this.style.background='var(--gradient-primary)';this.style.color='white'"
+             onmouseout="this.style.background='rgba(255,255,255,0.06)';this.style.color='rgba(255,255,255,0.5)'">
+            <i class="bi {{ icon }}"></i>
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="col-6 col-lg-2 offset-lg-2">
+        <h6 style="color:white;font-weight:700;margin-bottom:16px;font-size:.85rem;">Platform</h6>
+        {% for link in ['Features', 'Domains', 'Pricing', 'Roadmaps'] %}
+        <a href="#" style="display:block;color:rgba(255,255,255,0.45);font-size:.85rem;text-decoration:none;margin-bottom:10px;transition:color .2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.45)'">{{ link }}</a>
+        {% endfor %}
+      </div>
+      <div class="col-6 col-lg-2">
+        <h6 style="color:white;font-weight:700;margin-bottom:16px;font-size:.85rem;">Company</h6>
+        {% for link in ['About', 'Blog', 'Careers', 'Contact'] %}
+        <a href="#" style="display:block;color:rgba(255,255,255,0.45);font-size:.85rem;text-decoration:none;margin-bottom:10px;transition:color .2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.45)'">{{ link }}</a>
+        {% endfor %}
+      </div>
+      <div class="col-6 col-lg-2">
+        <h6 style="color:white;font-weight:700;margin-bottom:16px;font-size:.85rem;">Legal</h6>
+        {% for link in ['Privacy', 'Terms', 'Security', 'Cookies'] %}
+        <a href="#" style="display:block;color:rgba(255,255,255,0.45);font-size:.85rem;text-decoration:none;margin-bottom:10px;transition:color .2s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.45)'">{{ link }}</a>
+        {% endfor %}
+      </div>
+    </div>
+    <div style="border-top:1px solid rgba(255,255,255,0.06);margin-top:40px;padding-top:24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+      <p style="color:rgba(255,255,255,0.3);font-size:.8rem;margin:0;">© 2024 EduPilot. All rights reserved.</p>
+      <p style="color:rgba(255,255,255,0.3);font-size:.8rem;margin:0;">Made with ❤️ powered by <span style="color:rgba(108,99,255,0.7);">IBM Watsonx.ai Granite</span></p>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Navbar scroll effect
+  window.addEventListener('scroll', () => {
+    document.getElementById('landingNav').classList.toggle('scrolled', window.scrollY > 50);
+  });
+
+  // Smooth scroll for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth' });
+    });
+  });
+
+  // Intersection Observer for animations
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.glass-card, .domain-card').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    observer.observe(el);
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,281 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard – EduPilot{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+
+  <!-- Welcome Banner -->
+  <div class="col-12">
+    <div style="background:var(--gradient-primary);border-radius:var(--radius-lg);padding:28px 32px;position:relative;overflow:hidden;">
+      <div style="position:absolute;right:-20px;top:-20px;width:200px;height:200px;background:rgba(255,255,255,0.08);border-radius:50%;"></div>
+      <div style="position:absolute;right:80px;bottom:-40px;width:150px;height:150px;background:rgba(255,255,255,0.05);border-radius:50%;"></div>
+
+      <div class="row align-items-center">
+        <div class="col-md-8">
+          <h2 style="font-family:var(--font-display);color:white;font-weight:800;font-size:1.6rem;margin-bottom:6px;">
+            👋 Welcome back, {{ current_user.profile.full_name.split()[0] if current_user.profile and current_user.profile.full_name else current_user.username }}!
+          </h2>
+          <p style="color:rgba(255,255,255,0.8);margin-bottom:0;font-size:.9rem;">
+            {% if current_user.profile and current_user.profile.career_goal %}
+              Your goal: <strong>{{ current_user.profile.career_goal }}</strong> — let's make it happen! 🚀
+            {% else %}
+              Complete your profile to get your personalized AI learning roadmap.
+            {% endif %}
+          </p>
+        </div>
+        <div class="col-md-4 mt-3 mt-md-0 d-flex justify-content-md-end gap-3">
+          <a href="{{ url_for('chat.index') }}" class="btn" style="background:rgba(255,255,255,0.2);color:white;border:1px solid rgba(255,255,255,0.3);border-radius:50px;font-weight:600;font-size:.85rem;padding:10px 20px;">
+            <i class="bi bi-chat-dots me-2"></i>Chat with Aria
+          </a>
+          {% if not (current_user.profile and current_user.profile.career_goal) %}
+          <a href="{{ url_for('profile.setup') }}" class="btn" style="background:white;color:var(--primary);border-radius:50px;font-weight:700;font-size:.85rem;padding:10px 20px;">
+            Setup Profile →
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stat Cards Row -->
+  <div class="col-6 col-lg-3">
+    <div class="stat-card animate-fade-up stagger-1">
+      <div class="stat-icon" style="background:rgba(108,99,255,0.12);color:var(--primary);">
+        <i class="bi bi-trophy"></i>
+      </div>
+      <div class="stat-body">
+        <div class="stat-value">{{ readiness_score }}<span style="font-size:1.2rem;">%</span></div>
+        <div class="stat-label">Career Readiness</div>
+        <div class="stat-change positive">
+          <i class="bi bi-arrow-up-right"></i> {{ readiness_label }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-6 col-lg-3">
+    <div class="stat-card animate-fade-up stagger-2" style="--top-color:var(--gradient-ocean);">
+      <div class="stat-icon" style="background:rgba(78,205,196,0.12);color:#4ECDC4;">
+        <i class="bi bi-fire"></i>
+      </div>
+      <div class="stat-body">
+        <div class="stat-value">{{ streak_days }}</div>
+        <div class="stat-label">Day Streak 🔥</div>
+        <div class="stat-change positive">
+          <i class="bi bi-calendar-check"></i> Keep it up!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-6 col-lg-3">
+    <div class="stat-card animate-fade-up stagger-3">
+      <div class="stat-icon" style="background:rgba(46,213,115,0.12);color:#2ED573;">
+        <i class="bi bi-check2-circle"></i>
+      </div>
+      <div class="stat-body">
+        <div class="stat-value">{{ completed_milestones }}</div>
+        <div class="stat-label">Milestones Done</div>
+        <div class="stat-change {{ 'positive' if completed_milestones > 0 else '' }}">
+          <i class="bi bi-layers"></i> of {{ total_milestones }} total
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-6 col-lg-3">
+    <div class="stat-card animate-fade-up stagger-4">
+      <div class="stat-icon" style="background:rgba(255,107,157,0.12);color:#FF6B9D;">
+        <i class="bi bi-award"></i>
+      </div>
+      <div class="stat-body">
+        <div class="stat-value">{{ current_user.achievements.count() }}</div>
+        <div class="stat-label">Badges Earned</div>
+        <div class="stat-change positive">
+          <i class="bi bi-stars"></i> Keep earning!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active Roadmap -->
+  <div class="col-lg-7">
+    <div class="glass-card h-100">
+      <div class="glass-card-body">
+        <div class="section-title">
+          <div class="title-icon"><i class="bi bi-map"></i></div>
+          Active Learning Roadmap
+          <a href="{{ url_for('roadmap.index') }}" class="ms-auto text-decoration-none" style="font-size:.8rem;color:var(--primary);font-weight:600;">View All →</a>
+        </div>
+
+        {% if active_roadmap %}
+          <div class="d-flex align-items-center justify-content-between mb-3">
+            <div>
+              <h4 style="font-family:var(--font-display);font-size:1.1rem;font-weight:700;">{{ active_roadmap.title }}</h4>
+              <span style="font-size:.75rem;color:var(--text-muted);">{{ active_roadmap.domain }}</span>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-family:var(--font-display);font-size:1.8rem;font-weight:800;color:var(--primary);">{{ active_roadmap.completion_percentage() }}%</div>
+              <div style="font-size:.7rem;color:var(--text-muted);">Complete</div>
+            </div>
+          </div>
+
+          <div class="progress-bar-custom mb-4">
+            <div class="progress-bar-fill" style="width:{{ active_roadmap.completion_percentage() }}%;"></div>
+          </div>
+
+          <!-- Level progress breakdown -->
+          {% for level, color in [('beginner', '#2ED573'), ('intermediate', '#6C63FF'), ('advanced', '#FF6B9D')] %}
+          {% set level_total = active_roadmap.milestones.filter_by(level=level).count() %}
+          {% set level_done = active_roadmap.milestones.filter_by(level=level, completed=True).count() %}
+          <div class="d-flex align-items-center gap-3 mb-2">
+            <span style="font-size:.75rem;font-weight:600;color:{{ color }};width:90px;text-transform:capitalize;">{{ level }}</span>
+            <div style="flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;">
+              <div style="width:{{ (level_done/level_total*100) if level_total > 0 else 0 }}%;height:100%;background:{{ color }};border-radius:3px;transition:width 1s;"></div>
+            </div>
+            <span style="font-size:.75rem;color:var(--text-muted);width:50px;text-align:right;">{{ level_done }}/{{ level_total }}</span>
+          </div>
+          {% endfor %}
+
+          <div class="d-flex gap-2 mt-4">
+            <a href="{{ url_for('roadmap.view', roadmap_id=active_roadmap.id) }}" class="btn-gradient" style="padding:8px 20px;font-size:.85rem;">
+              <i class="bi bi-arrow-right-circle"></i> Continue
+            </a>
+            <a href="{{ url_for('roadmap.index') }}" class="btn-gradient-outline" style="padding:8px 20px;font-size:.85rem;">
+              <i class="bi bi-plus"></i> New Roadmap
+            </a>
+          </div>
+        {% else %}
+          <div style="text-align:center;padding:40px 20px;">
+            <div style="width:80px;height:80px;background:rgba(108,99,255,0.08);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:2rem;">🗺️</div>
+            <h4 style="font-family:var(--font-display);font-size:1rem;font-weight:700;margin-bottom:8px;">No Roadmap Yet</h4>
+            <p style="color:var(--text-muted);font-size:.85rem;margin-bottom:20px;">Generate your personalized AI learning roadmap to get started.</p>
+            <a href="{{ url_for('roadmap.index') }}" class="btn-gradient" style="padding:10px 24px;font-size:.875rem;">
+              <i class="bi bi-magic"></i> Generate My Roadmap
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Column: Career Readiness + AI Quick Chat -->
+  <div class="col-lg-5">
+    <!-- Career Readiness Ring -->
+    <div class="glass-card mb-4">
+      <div class="glass-card-body" style="text-align:center;">
+        <div class="section-title justify-content-center mb-4">
+          <div class="title-icon"><i class="bi bi-trophy"></i></div>
+          Career Readiness
+        </div>
+
+        <div class="progress-ring-container" style="margin:0 auto 16px;">
+          <svg class="progress-ring" width="140" height="140">
+            <circle class="progress-ring-track" cx="70" cy="70" r="56" stroke-width="10"></circle>
+            <circle class="progress-ring-fill" id="readinessRing" cx="70" cy="70" r="56" stroke-width="10"
+                    stroke="{{ readiness_color }}"
+                    stroke-dasharray="{{ 2 * 3.14159 * 56 }}"
+                    stroke-dashoffset="{{ 2 * 3.14159 * 56 * (1 - readiness_score/100) }}"></circle>
+          </svg>
+          <div class="progress-ring-label">
+            <div class="progress-ring-value" style="color:{{ readiness_color }};">{{ readiness_score }}%</div>
+            <div class="progress-ring-sublabel">{{ readiness_label }}</div>
+          </div>
+        </div>
+
+        <!-- Readiness Breakdown -->
+        <div class="row g-2 text-center">
+          {% for item, icon, pct, color in [
+            ('Profile', 'bi-person', current_user.profile.completion_percentage() if current_user.profile else 0, '#6C63FF'),
+            ('Skills', 'bi-lightning', [30, 60, 90][['beginner','intermediate','advanced'].index(current_user.profile.experience_level if current_user.profile and current_user.profile.experience_level else 'beginner')], '#4ECDC4'),
+            ('Progress', 'bi-check2', (completed_milestones * 100 // total_milestones) if total_milestones > 0 else 0, '#2ED573'),
+          ] %}
+          <div class="col-4">
+            <div style="font-size:1.1rem;font-weight:700;color:{{ color }};">{{ pct }}%</div>
+            <div style="font-size:.7rem;color:var(--text-muted);">{{ item }}</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick AI Chat -->
+    <div class="glass-card">
+      <div class="glass-card-body">
+        <div class="section-title mb-3">
+          <div class="title-icon" style="background:var(--gradient-warm);"><i class="bi bi-robot"></i></div>
+          Quick Chat with Aria
+          <span class="sidebar-badge ms-auto" style="background:var(--gradient-primary);">AI</span>
+        </div>
+        <div style="background:rgba(108,99,255,0.05);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px;font-size:.85rem;color:var(--text-secondary);">
+          <span style="color:var(--primary);font-weight:700;">Aria:</span> 👋 Hey! Ready to continue your learning journey? Ask me anything!
+        </div>
+        <a href="{{ url_for('chat.index') }}" class="btn-gradient w-100" style="justify-content:center;padding:10px;">
+          <i class="bi bi-chat-dots"></i> Open Full Chat
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Achievements -->
+  {% if recent_achievements %}
+  <div class="col-12">
+    <div class="glass-card">
+      <div class="glass-card-body">
+        <div class="section-title mb-4">
+          <div class="title-icon" style="background:linear-gradient(135deg,#FFB347,#FF6B6B);"><i class="bi bi-award"></i></div>
+          Recent Achievements
+          <a href="{{ url_for('dashboard.index') }}" class="ms-auto text-decoration-none" style="font-size:.8rem;color:var(--primary);font-weight:600;">View All →</a>
+        </div>
+        <div class="row g-3">
+          {% for achievement in recent_achievements %}
+          <div class="col-6 col-md-4 col-lg-2">
+            <div style="text-align:center;background:var(--bg-glass);border:1px solid var(--border);border-radius:12px;padding:16px 8px;">
+              <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,{{ achievement.badge_color }},{{ achievement.badge_color }}88);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;font-size:1.5rem;color:white;">
+                <i class="bi {{ achievement.badge_icon }}"></i>
+              </div>
+              <div style="font-size:.75rem;font-weight:700;color:var(--text);">{{ achievement.badge_name }}</div>
+              <div style="font-size:.65rem;color:var(--text-muted);margin-top:2px;">{{ achievement.earned_at.strftime('%b %d') if achievement.earned_at else '' }}</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Career Domains Quick Access -->
+  <div class="col-12">
+    <div class="glass-card">
+      <div class="glass-card-body">
+        <div class="section-title mb-4">
+          <div class="title-icon" style="background:var(--gradient-ocean);"><i class="bi bi-grid-3x3-gap"></i></div>
+          Explore Career Domains
+        </div>
+        <div class="row g-2">
+          {% for domain in career_domains[:8] %}
+          <div class="col-6 col-md-3 col-lg-3">
+            <a href="{{ url_for('roadmap.index') }}" class="text-decoration-none">
+              <div class="d-flex align-items-center gap-3 p-3 rounded-3 border border-opacity-25 transition" style="border-color:var(--border) !important;transition:var(--transition);"
+                   onmouseover="this.style.background='rgba(108,99,255,0.05)';this.style.borderColor='var(--primary) !important'"
+                   onmouseout="this.style.background='';this.style.borderColor='var(--border) !important'">
+                <div style="width:36px;height:36px;border-radius:10px;background:{{ domain.color }}22;color:{{ domain.color }};display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">
+                  <i class="bi {{ domain.icon }}"></i>
+                </div>
+                <div>
+                  <div style="font-size:.8rem;font-weight:600;color:var(--text);">{{ domain.name }}</div>
+                  <div style="font-size:.7rem;color:var(--text-muted);">{{ domain.avg_salary.split('–')[0].strip() }}+</div>
+                </div>
+              </div>
+            </a>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

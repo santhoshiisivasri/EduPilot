@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In – EduPilot</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" />
+</head>
+<body>
+<div class="auth-page">
+  <div class="hero-bg-orb orb-1"></div>
+  <div class="hero-bg-orb orb-2"></div>
+
+  <div class="auth-card">
+    <!-- Brand -->
+    <div class="text-center mb-4">
+      <a href="{{ url_for('main.index') }}" class="text-decoration-none d-inline-flex align-items-center gap-2 mb-3">
+        <div style="width:48px;height:48px;background:var(--gradient-primary);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:white;box-shadow:0 8px 25px rgba(108,99,255,0.4);">
+          <i class="bi bi-mortarboard-fill"></i>
+        </div>
+        <span style="font-family:var(--font-display);font-size:1.5rem;font-weight:800;color:white;">EduPilot</span>
+      </a>
+      <h1 class="auth-title">Welcome Back!</h1>
+      <p class="auth-subtitle">Continue your personalized learning journey</p>
+    </div>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div style="background:rgba({{ '255,71,87' if category=='danger' else '46,213,115' }},0.1);border:1px solid rgba({{ '255,71,87' if category=='danger' else '46,213,115' }},0.3);border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:.85rem;color:{{ '#FF4757' if category=='danger' else '#2ED573' }};">
+            <i class="bi bi-{{ 'x-circle' if category=='danger' else 'check-circle' }}-fill me-2"></i>{{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('auth.login') }}">
+      <div class="form-floating-custom">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" class="form-control" placeholder="your@email.com" required />
+      </div>
+
+      <div class="form-floating-custom">
+        <label for="password">Password</label>
+        <div style="position:relative;">
+          <input type="password" id="password" name="password" class="form-control" placeholder="Your password" required style="padding-right:48px;" />
+          <button type="button" onclick="togglePwd()"
+                  id="eyeBtn"
+                  style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,0.4);cursor:pointer;font-size:1rem;">
+            <i class="bi bi-eye"></i>
+          </button>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <label style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.6);font-size:.8rem;cursor:pointer;">
+          <input type="checkbox" name="remember" style="accent-color:var(--primary);" />
+          Remember me
+        </label>
+        <a href="#" style="color:var(--primary);font-size:.8rem;">Forgot password?</a>
+      </div>
+
+      <button type="submit" class="btn-gradient w-100" style="padding:14px;font-size:1rem;justify-content:center;">
+        <i class="bi bi-box-arrow-in-right"></i>
+        Sign In to EduPilot
+      </button>
+    </form>
+
+    <!-- Demo login hint -->
+    <div style="background:rgba(108,99,255,0.1);border:1px solid rgba(108,99,255,0.2);border-radius:10px;padding:12px 16px;margin-top:16px;text-align:center;">
+      <p style="color:rgba(255,255,255,0.6);font-size:.78rem;margin:0;">
+        <i class="bi bi-info-circle me-1" style="color:var(--primary);"></i>
+        Admin login: <code style="color:var(--primary);">admin@edupilot.ai</code> / <code style="color:var(--primary);">Admin@123!</code>
+      </p>
+    </div>
+
+    <div style="text-align:center;margin-top:24px;border-top:1px solid rgba(255,255,255,0.1);padding-top:20px;">
+      <p style="color:rgba(255,255,255,0.5);font-size:.85rem;margin:0;">
+        Don't have an account?
+        <a href="{{ url_for('auth.register') }}" style="color:var(--primary);font-weight:600;">Create one free →</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+  function togglePwd() {
+    const input = document.getElementById('password');
+    const btn = document.getElementById('eyeBtn');
+    if (input.type === 'password') {
+      input.type = 'text';
+      btn.innerHTML = '<i class="bi bi-eye-slash"></i>';
+    } else {
+      input.type = 'password';
+      btn.innerHTML = '<i class="bi bi-eye"></i>';
+    }
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+{% block title %}AI Coach – EduPilot{% endblock %}
+{% block page_title %}AI Learning Coach{% endblock %}
+
+{% block content %}
+<div class="row g-4 h-100">
+  <!-- Chat Main -->
+  <div class="col-lg-8">
+    <div class="glass-card h-100">
+      <!-- Chat Header -->
+      <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;">
+        <div style="width:44px;height:44px;border-radius:50%;background:var(--gradient-primary);display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:white;box-shadow:0 4px 15px rgba(108,99,255,0.4);">
+          🤖
+        </div>
+        <div>
+          <div style="font-weight:700;font-family:var(--font-display);">Aria – AI Learning Coach</div>
+          <div style="font-size:.75rem;color:var(--text-muted);display:flex;align-items:center;gap:5px;">
+            <span style="width:7px;height:7px;background:#2ED573;border-radius:50%;display:inline-block;animation:pulse-glow 2s infinite;"></span>
+            Powered by IBM Watsonx.ai Granite · Always available
+          </div>
+        </div>
+        <div class="ms-auto d-flex gap-2">
+          <button onclick="clearChat()" class="btn-gradient-outline" style="padding:6px 14px;font-size:.75rem;">
+            <i class="bi bi-trash3"></i> Clear
+          </button>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div class="chat-messages" id="chatMessages">
+
+        <!-- Welcome message (shown if no history) -->
+        {% if not history %}
+        <div class="chat-bubble assistant" id="welcomeMsg">
+          <strong>👋 Hi, {{ current_user.profile.full_name.split()[0] if current_user.profile and current_user.profile.full_name else current_user.username }}! I'm Aria, your EduPilot AI Learning Coach.</strong>
+          <p style="margin-top:8px;">I'm powered by <strong>IBM Watsonx.ai Granite</strong> and I'm here to help you build your personalized tech career. Here's what I can help you with:</p>
+          <ul style="margin:8px 0;padding-left:20px;">
+            <li>🗺️ Generate a personalized learning roadmap</li>
+            <li>📚 Recommend courses, projects, and certifications</li>
+            <li>🎯 Identify your skill gaps and how to fill them</li>
+            <li>📅 Create a weekly study plan</li>
+            <li>💼 Guide your career path and interview prep</li>
+          </ul>
+          <p>What would you like to focus on today? Tell me about your career goal! 🚀</p>
+        </div>
+        {% endif %}
+
+        <!-- Chat history -->
+        {% for msg in history %}
+        <div class="chat-bubble {{ msg.role }}" data-time="{{ msg.timestamp }}">
+          {% if msg.role == 'assistant' %}
+            <span class="chat-content">{{ msg.content }}</span>
+          {% else %}
+            {{ msg.content }}
+          {% endif %}
+        </div>
+        {% endfor %}
+
+        <!-- Typing indicator (hidden by default) -->
+        <div class="chat-bubble assistant" id="typingIndicator" style="display:none;">
+          <div class="typing-indicator">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <span style="font-size:.78rem;color:var(--text-muted);margin-left:4px;">Aria is thinking...</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Suggestions -->
+      <div class="chat-suggestions" id="chatSuggestions">
+        {% set suggestions = [
+          '🗺️ Create my learning roadmap',
+          '🎯 What skills should I learn?',
+          '📅 Make me a weekly study plan',
+          '💼 Career paths in AI/ML',
+          '📜 Which certifications matter?',
+          '🔧 Suggest projects for my level'
+        ] %}
+        {% for suggestion in suggestions %}
+        <button class="suggestion-chip" onclick="sendSuggestion(this)">{{ suggestion }}</button>
+        {% endfor %}
+      </div>
+
+      <!-- Input Area -->
+      <div class="chat-input-area">
+        <textarea class="chat-input"
+                  id="chatInput"
+                  placeholder="Ask Aria anything about your learning journey..."
+                  rows="1"
+                  onkeydown="handleEnter(event)"
+                  oninput="autoResize(this)"></textarea>
+        <button class="chat-send-btn" id="sendBtn" onclick="sendMessage()">
+          <i class="bi bi-send-fill"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Panel -->
+  <div class="col-lg-4">
+    <!-- Quick Actions -->
+    <div class="glass-card mb-4">
+      <div class="glass-card-body">
+        <div class="section-title mb-3">
+          <div class="title-icon"><i class="bi bi-lightning-charge"></i></div>
+          Quick Actions
+        </div>
+        <div class="d-grid gap-2">
+          {% for label, icon, url in [
+            ('Generate Roadmap', 'bi-map', url_for('roadmap.index')),
+            ('Take Assessment', 'bi-clipboard-check', url_for('assessment.index')),
+            ('Study Planner', 'bi-calendar-week', url_for('planner.index')),
+            ('Career Guide', 'bi-briefcase', url_for('career.index')),
+          ] %}
+          <a href="{{ url }}" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg-glass);border:1px solid var(--border);border-radius:10px;text-decoration:none;color:var(--text);font-size:.85rem;font-weight:500;transition:var(--transition);"
+             onmouseover="this.style.background='rgba(108,99,255,0.08)';this.style.borderColor='var(--primary)'"
+             onmouseout="this.style.background='var(--bg-glass)';this.style.borderColor='var(--border)'">
+            <i class="bi {{ icon }}" style="color:var(--primary);font-size:1.1rem;"></i>
+            {{ label }}
+            <i class="bi bi-chevron-right ms-auto" style="color:var(--text-muted);font-size:.8rem;"></i>
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Summary -->
+    <div class="glass-card mb-4">
+      <div class="glass-card-body">
+        <div class="section-title mb-3">
+          <div class="title-icon"><i class="bi bi-person-badge"></i></div>
+          Your Profile
+        </div>
+        {% if current_user.profile %}
+        <div class="row g-2">
+          {% for label, value in [
+            ('Goal', current_user.profile.career_goal or 'Not set'),
+            ('Level', current_user.profile.experience_level or 'Beginner'),
+            ('Study Time', (current_user.profile.study_hours_per_week|string + ' hrs/week') if current_user.profile.study_hours_per_week else 'Not set'),
+            ('Domain', current_user.profile.preferred_domain or 'Not set'),
+          ] %}
+          <div class="col-12">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:.82rem;">
+              <span style="color:var(--text-muted);">{{ label }}</span>
+              <span style="font-weight:600;color:var(--text);text-align:right;max-width:55%;" class="truncate">{{ value }}</span>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% if current_user.profile.skills_list %}
+        <div style="margin-top:12px;">
+          <div style="font-size:.75rem;color:var(--text-muted);margin-bottom:6px;">Skills</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;">
+            {% for skill in current_user.profile.skills_list[:5] %}
+            <span class="skill-tag" style="font-size:.65rem;">{{ skill }}</span>
+            {% endfor %}
+            {% if current_user.profile.skills_list|length > 5 %}
+            <span class="skill-tag" style="font-size:.65rem;">+{{ current_user.profile.skills_list|length - 5 }}</span>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+        {% else %}
+        <p style="color:var(--text-muted);font-size:.85rem;">
+          <a href="{{ url_for('profile.setup') }}" style="color:var(--primary);">Complete your profile</a> for better AI personalization.
+        </p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- IBM Badge -->
+    <div style="background:linear-gradient(135deg,rgba(26,42,108,0.8),rgba(63,43,150,0.8));border:1px solid rgba(108,99,255,0.3);border-radius:var(--radius);padding:16px;text-align:center;">
+      <div style="font-size:1.5rem;margin-bottom:6px;">🔵</div>
+      <div style="font-weight:700;font-size:.85rem;color:white;margin-bottom:4px;">IBM Watsonx.ai</div>
+      <div style="font-size:.72rem;color:rgba(255,255,255,0.6);">granite-4-h-small</div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+{% endblock %}

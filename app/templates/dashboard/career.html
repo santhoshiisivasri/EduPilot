@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% block title %}Career Guide – EduPilot{% endblock %}
+{% block page_title %}Career Guidance{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+
+  <!-- AI Career Analysis -->
+  <div class="col-12">
+    <div class="glass-card" style="background:var(--gradient-primary) !important;border:none;">
+      <div class="glass-card-body">
+        <div class="row align-items-center">
+          <div class="col-md-8" style="color:white;">
+            <h2 style="font-family:var(--font-display);font-weight:800;font-size:1.5rem;margin-bottom:6px;">🤖 Get AI Career Analysis</h2>
+            <p style="opacity:.85;font-size:.9rem;margin:0;">Let IBM Granite AI analyze your profile and recommend the best career paths for you.</p>
+          </div>
+          <div class="col-md-4 mt-3 mt-md-0 text-md-end">
+            <button onclick="getCareerAnalysis()" class="btn" style="background:white;color:var(--primary);font-weight:700;border-radius:50px;padding:10px 24px;">
+              <i class="bi bi-cpu me-2"></i> Analyze My Profile
+            </button>
+          </div>
+        </div>
+        <!-- AI Response Area -->
+        <div id="careerAnalysisResult" style="display:none;margin-top:20px;background:rgba(0,0,0,0.2);border-radius:12px;padding:20px;color:white;font-size:.875rem;line-height:1.7;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Matched Domains -->
+  <div class="col-12">
+    <div class="glass-card">
+      <div class="glass-card-body">
+        <div class="section-title mb-4">
+          <div class="title-icon"><i class="bi bi-lightning-charge"></i></div>
+          Your Best Career Matches
+          <span style="font-size:.75rem;color:var(--text-muted);font-weight:400;margin-left:8px;">Based on your profile</span>
+        </div>
+
+        <div class="row g-3">
+          {% for domain in matched_domains[:6] %}
+          <div class="col-md-6 col-lg-4">
+            <div style="background:var(--bg-glass);border:1px solid var(--border);border-radius:var(--radius);padding:20px;transition:var(--transition);position:relative;overflow:hidden;"
+                 onmouseover="this.style.borderColor='{{ domain.color }}';this.style.boxShadow='var(--shadow-hover)';this.style.transform='translateY(-2px)'"
+                 onmouseout="this.style.borderColor='var(--border)';this.style.boxShadow='';this.style.transform=''">
+
+              {% if loop.index <= 3 %}
+              <div style="position:absolute;top:12px;right:12px;background:{{ domain.color }}22;color:{{ domain.color }};font-size:.65rem;font-weight:700;padding:3px 8px;border-radius:20px;">
+                {% if loop.index == 1 %}🥇 Best Match{% elif loop.index == 2 %}🥈 Top Pick{% else %}🥉 Great Fit{% endif %}
+              </div>
+              {% endif %}
+
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+                <div style="width:48px;height:48px;border-radius:14px;background:{{ domain.color }}22;color:{{ domain.color }};display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;">
+                  <i class="bi {{ domain.icon }}"></i>
+                </div>
+                <div>
+                  <div style="font-weight:700;color:var(--text);font-size:.9rem;">{{ domain.name }}</div>
+                  <div style="font-size:.75rem;color:var(--text-muted);">{{ domain.avg_salary }}</div>
+                </div>
+              </div>
+
+              <p style="font-size:.8rem;color:var(--text-secondary);line-height:1.6;margin-bottom:12px;">{{ domain.description }}</p>
+
+              <div style="margin-bottom:14px;">
+                <div style="font-size:.7rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Key Skills</div>
+                <div style="display:flex;flex-wrap:wrap;gap:4px;">
+                  {% for skill in domain.key_skills[:4] %}
+                  <span style="background:{{ domain.color }}15;color:{{ domain.color }};font-size:.65rem;font-weight:600;padding:2px 8px;border-radius:20px;">{{ skill }}</span>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <div style="margin-bottom:14px;">
+                <div style="font-size:.7rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Job Roles</div>
+                <div style="font-size:.78rem;color:var(--text-secondary);">{{ domain.job_roles[:2] | join(' · ') }}</div>
+              </div>
+
+              <a href="{{ url_for('roadmap.index') }}" class="btn-gradient w-100" style="justify-content:center;padding:8px;font-size:.8rem;background:{{ domain.color }};">
+                <i class="bi bi-map"></i> Start {{ domain.name }} Roadmap
+              </a>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- All Domains -->
+  <div class="col-12">
+    <div class="glass-card">
+      <div class="glass-card-body">
+        <div class="section-title mb-4">
+          <div class="title-icon"><i class="bi bi-grid-3x3-gap"></i></div>
+          Explore All 12 Career Paths
+        </div>
+        <div class="row g-2">
+          {% for domain in career_domains %}
+          <div class="col-6 col-md-4 col-lg-3">
+            <a href="{{ url_for('roadmap.index') }}" class="text-decoration-none">
+              <div style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg-glass);border:1px solid var(--border);border-radius:10px;transition:var(--transition);"
+                   onmouseover="this.style.borderColor='{{ domain.color }}';this.style.background='{{ domain.color }}08'"
+                   onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--bg-glass)'">
+                <div style="width:32px;height:32px;border-radius:8px;background:{{ domain.color }}22;color:{{ domain.color }};display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;">
+                  <i class="bi {{ domain.icon }}"></i>
+                </div>
+                <div style="min-width:0;">
+                  <div style="font-size:.8rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ domain.name }}</div>
+                  <div style="font-size:.7rem;color:var(--text-muted);">{{ domain.avg_salary.split('–')[0].strip() }}+/yr</div>
+                </div>
+              </div>
+            </a>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function getCareerAnalysis() {
+  const btn = event.target.closest('button');
+  const resultDiv = document.getElementById('careerAnalysisResult');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;border-color:rgba(108,99,255,0.3);border-top-color:var(--primary);display:inline-block;"></div> Analyzing...';
+
+  resultDiv.style.display = 'none';
+
+  try {
+    const resp = await fetch('/career/analyze', { method: 'POST' });
+    const data = await resp.json();
+
+    if (data.analysis) {
+      resultDiv.innerHTML = marked.parse(data.analysis);
+      resultDiv.style.display = 'block';
+    }
+  } catch (e) {
+    resultDiv.innerHTML = '<p style="color:rgba(255,255,255,0.7);">Error getting analysis. Please try again.</p>';
+    resultDiv.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="bi bi-cpu me-2"></i> Analyze My Profile';
+  }
+}
+</script>
+{% endblock %}

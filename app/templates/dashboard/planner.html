@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% block title %}Study Planner – EduPilot{% endblock %}
+{% block page_title %}Weekly Study Planner{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+
+  <!-- Header -->
+  <div class="col-12">
+    <div class="glass-card">
+      <div class="glass-card-body">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+          <div>
+            <div class="section-title mb-1">
+              <div class="title-icon"><i class="bi bi-calendar-week"></i></div>
+              Week of {{ week_start.strftime('%B %d, %Y') }}
+              {% if current_milestone %}
+              <span style="background:rgba(108,99,255,0.1);color:var(--primary);font-size:.72rem;padding:3px 10px;border-radius:20px;margin-left:8px;">📍 {{ current_milestone.title }}</span>
+              {% endif %}
+            </div>
+            <p style="color:var(--text-muted);font-size:.85rem;margin:0;">AI generates a personalized study plan based on your current milestone and available time.</p>
+          </div>
+          <button onclick="generatePlan()" class="btn-gradient" style="padding:10px 22px;" id="generateBtn">
+            <i class="bi bi-cpu"></i> Generate AI Plan
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Plan Loading State -->
+  <div id="loadingState" style="display:none;" class="col-12">
+    <div class="glass-card">
+      <div class="glass-card-body text-center py-5">
+        <div class="spinner mx-auto" style="width:40px;height:40px;border-width:4px;margin-bottom:16px;"></div>
+        <p style="color:var(--text-muted);">IBM Granite is generating your personalized weekly plan...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Weekly Calendar -->
+  <div class="col-12" id="planDisplay">
+    {% if current_plan %}
+    {% set days_data = current_plan.daily_goals_dict %}
+    <div class="row g-3">
+      {% for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+      {% set day_data = days_data.get(day, {}) %}
+      {% set is_today = today.strftime('%A') == day %}
+      <div class="col-md-6 col-lg-3 {% if is_today %}col-lg-3{% endif %}">
+        <div class="day-column {{ 'today' if is_today else '' }}">
+          <div class="day-header d-flex justify-content-between">
+            <span>{{ day }}</span>
+            {% if is_today %}<span style="color:var(--primary);font-size:.7rem;">TODAY</span>{% endif %}
+          </div>
+
+          {% if day_data.get('focus') %}
+          <div style="background:rgba(108,99,255,0.08);border-radius:8px;padding:6px 10px;margin-bottom:10px;font-size:.75rem;color:var(--primary);font-weight:600;">
+            🎯 {{ day_data.focus }}
+          </div>
+          {% endif %}
+
+          {% for task in day_data.get('tasks', []) %}
+          <div class="task-item">
+            <input type="checkbox" class="task-checkbox" onchange="this.closest('.task-item').classList.toggle('done', this.checked)" />
+            <span>{{ task }}</span>
+          </div>
+          {% endfor %}
+
+          {% if day_data.get('hours') %}
+          <div style="margin-top:auto;padding-top:10px;font-size:.72rem;color:var(--text-muted);border-top:1px solid var(--border);">
+            ⏱️ {{ day_data.hours }}h planned
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <!-- Weekly Goals -->
+    <div class="mt-4">
+      <div class="glass-card">
+        <div class="glass-card-body">
+          <div class="section-title mb-3">
+            <div class="title-icon"><i class="bi bi-target"></i></div>
+            This Week's Goals
+            <span style="margin-left:auto;font-size:.8rem;color:var(--text-muted);">
+              <i class="bi bi-clock"></i> {{ current_plan.total_hours }}h total
+            </span>
+          </div>
+          <div class="row g-2">
+            {% for goal in current_plan.daily_goals_dict.get('goals', []) %}
+            <div class="col-md-4">
+              <div style="background:var(--bg-glass);border:1px solid var(--border);border-radius:10px;padding:12px;display:flex;align-items:center;gap:8px;">
+                <div style="width:24px;height:24px;border-radius:50%;background:var(--gradient-primary);display:flex;align-items:center;justify-content:center;color:white;font-size:.75rem;font-weight:700;flex-shrink:0;">{{ loop.index }}</div>
+                <span style="font-size:.8rem;color:var(--text);">{{ goal }}</span>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+
+          {% if current_plan.daily_goals_dict.get('motivation') %}
+          <div style="margin-top:16px;background:var(--gradient-primary);border-radius:12px;padding:14px 20px;color:white;font-size:.875rem;font-style:italic;">
+            💡 "{{ current_plan.daily_goals_dict.motivation }}"
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    {% else %}
+    <div class="glass-card">
+      <div class="glass-card-body text-center py-5">
+        <div style="font-size:4rem;margin-bottom:16px;">📅</div>
+        <h3 style="font-family:var(--font-display);font-weight:700;margin-bottom:8px;">No Plan for This Week</h3>
+        <p style="color:var(--text-muted);font-size:.9rem;margin-bottom:24px;">Click "Generate AI Plan" and IBM Granite will create a personalized weekly study schedule for you.</p>
+        <button onclick="generatePlan()" class="btn-gradient" style="padding:12px 32px;">
+          <i class="bi bi-cpu"></i> Generate My Weekly Plan
+        </button>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Past Plans -->
+  {% if past_plans|length > 1 %}
+  <div class="col-12">
+    <div class="glass-card">
+      <div class="glass-card-body">
+        <div class="section-title mb-3">
+          <div class="title-icon"><i class="bi bi-clock-history"></i></div>
+          Past Plans
+        </div>
+        <div class="row g-3">
+          {% for plan in past_plans %}
+          <div class="col-md-3">
+            <div style="background:var(--bg-glass);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;">
+              <div style="font-size:.85rem;font-weight:700;color:var(--text);">{{ plan.week_start.strftime('%b %d') }}</div>
+              <div style="font-size:.75rem;color:var(--text-muted);margin-bottom:8px;">Week of</div>
+              <div style="font-size:1.2rem;font-weight:800;color:var(--primary);">{{ plan.total_hours }}h</div>
+              <div style="font-size:.7rem;color:var(--text-muted);">planned</div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/planner.js') }}"></script>
+{% endblock %}

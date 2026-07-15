@@ -1,0 +1,275 @@
+{% extends 'base.html' %}
+{% block title %}Skill Assessment – EduPilot{% endblock %}
+{% block page_title %}Skill Assessment{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+
+  {% if taking_assessment %}
+  <!-- Quiz Interface -->
+  <div class="col-lg-8 mx-auto">
+    <div class="glass-card">
+      <div class="glass-card-body">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <div>
+            <h2 style="font-family:var(--font-display);font-size:1.3rem;font-weight:800;">{{ domain | title }} Assessment</h2>
+            <p style="color:var(--text-muted);font-size:.85rem;margin:0;">AI-evaluated by IBM Watsonx.ai Granite</p>
+          </div>
+          <div style="text-align:right;">
+            <span id="questionCount" style="font-family:var(--font-display);font-size:1.5rem;font-weight:700;color:var(--primary);">1/{{ questions|length }}</span>
+          </div>
+        </div>
+
+        <!-- Quiz Progress -->
+        <div class="quiz-progress">
+          <div class="quiz-progress-fill" id="quizProgress" style="width:{{ (1/questions|length*100)|round(1) }}%;"></div>
+        </div>
+
+        <!-- Questions Container -->
+        <div id="questionsContainer">
+          {% for question in questions %}
+          <div class="question-card" id="question-{{ question.id }}" {% if not loop.first %}style="display:none;"{% endif %}>
+            <div class="question-number">Question {{ loop.index }} of {{ questions|length }}</div>
+            <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:20px;line-height:1.5;">{{ question.question }}</h3>
+            <textarea
+              id="answer-{{ question.id }}"
+              placeholder="Type your answer here... (be as detailed as you want)"
+              style="width:100%;min-height:120px;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px;color:var(--text);font-family:var(--font-main);font-size:.875rem;resize:vertical;outline:none;transition:var(--transition);"
+              onfocus="this.style.borderColor='var(--primary)'"
+              onblur="this.style.borderColor='var(--border)'"></textarea>
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- Navigation -->
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:24px;">
+          <button onclick="prevQuestion()" id="prevBtn" class="btn-gradient-outline" style="padding:10px 24px;" disabled>
+            <i class="bi bi-arrow-left"></i> Previous
+          </button>
+          <div id="questionDots" style="display:flex;gap:6px;">
+            {% for q in questions %}
+            <div style="width:8px;height:8px;border-radius:50%;background:{% if loop.first %}var(--primary){% else %}var(--border){% endif %};transition:var(--transition);" id="dot-{{ q.id }}"></div>
+            {% endfor %}
+          </div>
+          <button onclick="nextQuestion()" id="nextBtn" class="btn-gradient" style="padding:10px 24px;">
+            Next <i class="bi bi-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Submit (hidden until last question) -->
+    <div id="submitSection" style="display:none;margin-top:16px;">
+      <div class="glass-card">
+        <div class="glass-card-body text-center">
+          <h3 style="font-family:var(--font-display);margin-bottom:8px;">Ready to Submit?</h3>
+          <p style="color:var(--text-muted);font-size:.875rem;margin-bottom:20px;">IBM Granite AI will evaluate your answers and provide personalized feedback.</p>
+          <button onclick="submitAssessment()" class="btn-gradient" style="padding:12px 36px;font-size:1rem;">
+            <i class="bi bi-cpu"></i> Submit & Get AI Evaluation
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Results (hidden until submitted) -->
+    <div id="resultsSection" style="display:none;margin-top:16px;">
+      <div class="glass-card">
+        <div class="glass-card-body">
+          <div class="text-center mb-4">
+            <div class="score-circle" id="scoreCircle">
+              <div class="score-number" id="scoreNumber">-</div>
+              <div style="font-size:.75rem;color:rgba(255,255,255,0.8);">Score</div>
+            </div>
+            <h3 id="gradeLabel" style="font-family:var(--font-display);font-size:1.4rem;font-weight:800;"></h3>
+            <p id="feedbackText" style="color:var(--text-muted);font-size:.9rem;max-width:500px;margin:8px auto 0;"></p>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div style="background:rgba(46,213,115,0.08);border:1px solid rgba(46,213,115,0.2);border-radius:12px;padding:16px;">
+                <div style="font-weight:700;color:#2ED573;margin-bottom:10px;font-size:.875rem;">💪 Strengths</div>
+                <ul id="strengthsList" style="font-size:.85rem;color:var(--text);padding-left:18px;margin:0;"></ul>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div style="background:rgba(255,71,87,0.08);border:1px solid rgba(255,71,87,0.2);border-radius:12px;padding:16px;">
+                <div style="font-weight:700;color:#FF4757;margin-bottom:10px;font-size:.875rem;">🎯 Areas to Improve</div>
+                <ul id="gapsList" style="font-size:.85rem;color:var(--text);padding-left:18px;margin:0;"></ul>
+              </div>
+            </div>
+            <div class="col-12">
+              <div style="background:rgba(108,99,255,0.08);border:1px solid rgba(108,99,255,0.2);border-radius:12px;padding:16px;">
+                <div style="font-weight:700;color:var(--primary);margin-bottom:10px;font-size:.875rem;">📚 AI Recommendations</div>
+                <ol id="recommendationsList" style="font-size:.85rem;color:var(--text);padding-left:18px;margin:0;"></ol>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex gap-3 mt-4 justify-content-center">
+            <a href="{{ url_for('roadmap.index') }}" class="btn-gradient" style="padding:10px 24px;">
+              <i class="bi bi-map"></i> Generate Roadmap
+            </a>
+            <a href="{{ url_for('assessment.index') }}" class="btn-gradient-outline" style="padding:10px 24px;">
+              <i class="bi bi-arrow-repeat"></i> Try Another
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% else %}
+  <!-- Assessment Selection -->
+  <div class="col-12">
+    <div class="glass-card">
+      <div class="glass-card-body">
+        <div class="section-title mb-1">
+          <div class="title-icon"><i class="bi bi-clipboard-check"></i></div>
+          Choose Assessment Domain
+        </div>
+        <p style="color:var(--text-muted);font-size:.875rem;margin-bottom:24px;">Take an AI-evaluated quiz to identify your skill level and get personalized learning recommendations.</p>
+
+        <div class="row g-3">
+          {% for domain in career_domains %}
+          <div class="col-md-4 col-lg-3">
+            <a href="{{ url_for('assessment.start', domain=domain.id) }}" class="text-decoration-none">
+              <div class="domain-card" style="text-align:left;padding:16px;">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+                  <div style="width:40px;height:40px;border-radius:12px;background:{{ domain.color }}22;color:{{ domain.color }};display:flex;align-items:center;justify-content:center;font-size:1.3rem;">
+                    <i class="bi {{ domain.icon }}"></i>
+                  </div>
+                  <div>
+                    <div style="font-size:.875rem;font-weight:700;color:var(--text);">{{ domain.name }}</div>
+                    <div style="font-size:.7rem;color:var(--text-muted);">10 questions</div>
+                  </div>
+                </div>
+                <div style="font-size:.75rem;color:var(--text-muted);">AI-evaluated · ~10 mins</div>
+              </div>
+            </a>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Past Assessments -->
+  {% if past_assessments %}
+  <div class="col-12">
+    <div class="glass-card">
+      <div class="glass-card-body">
+        <div class="section-title mb-4">
+          <div class="title-icon"><i class="bi bi-clock-history"></i></div>
+          Past Assessments
+        </div>
+        <div class="row g-3">
+          {% for a in past_assessments %}
+          <div class="col-md-6 col-lg-4">
+            <div style="background:var(--bg-glass);border:1px solid var(--border);border-radius:12px;padding:16px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <span style="font-size:.875rem;font-weight:700;">{{ a.domain | title }}</span>
+                <span style="font-size:1.2rem;font-weight:800;color:var(--primary);">{{ a.score|round(0)|int }}%</span>
+              </div>
+              <div style="font-size:.75rem;color:var(--text-muted);margin-bottom:8px;">{{ a.taken_at.strftime('%b %d, %Y') if a.taken_at else '' }}</div>
+              <span style="font-size:.72rem;padding:3px 10px;border-radius:20px;font-weight:600;
+                background:rgba({{ '46,213,115' if a.score >= 80 else ('255,165,0' if a.score >= 60 else '255,71,87') }},0.1);
+                color:{{ '#2ED573' if a.score >= 80 else ('#FFA500' if a.score >= 60 else '#FF4757') }};">
+                {{ a.grade_label() }}
+              </span>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  {% endif %}
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% if taking_assessment %}
+<script>
+  const questions = {{ questions | tojson }};
+  const domain = "{{ domain }}";
+  let currentIndex = 0;
+
+  function updateUI() {
+    questions.forEach((q, i) => {
+      document.getElementById(`question-${q.id}`).style.display = i === currentIndex ? 'block' : 'none';
+      document.getElementById(`dot-${q.id}`).style.background = i <= currentIndex ? 'var(--primary)' : 'var(--border)';
+    });
+    document.getElementById('questionCount').textContent = `${currentIndex + 1}/${questions.length}`;
+    document.getElementById('quizProgress').style.width = `${((currentIndex + 1) / questions.length) * 100}%`;
+    document.getElementById('prevBtn').disabled = currentIndex === 0;
+
+    if (currentIndex === questions.length - 1) {
+      document.getElementById('nextBtn').style.display = 'none';
+      document.getElementById('submitSection').style.display = 'block';
+    } else {
+      document.getElementById('nextBtn').style.display = '';
+      document.getElementById('submitSection').style.display = 'none';
+    }
+  }
+
+  function nextQuestion() {
+    if (currentIndex < questions.length - 1) { currentIndex++; updateUI(); }
+  }
+  function prevQuestion() {
+    if (currentIndex > 0) { currentIndex--; updateUI(); }
+  }
+
+  async function submitAssessment() {
+    const answers = {};
+    questions.forEach(q => {
+      const el = document.getElementById(`answer-${q.id}`);
+      if (el) answers[q.id] = el.value;
+    });
+
+    const submitBtn = document.querySelector('#submitSection button');
+    submitBtn.innerHTML = '<div class="spinner" style="width:18px;height:18px;border-width:2px;"></div> AI is evaluating...';
+    submitBtn.disabled = true;
+
+    try {
+      const resp = await fetch('/assessment/submit', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ domain, answers })
+      });
+      const data = await resp.json();
+
+      // Show results
+      document.getElementById('questionsContainer').style.display = 'none';
+      document.querySelector('.quiz-progress').style.display = 'none';
+      document.getElementById('submitSection').style.display = 'none';
+      document.querySelector('[id^="question-"]').closest('.glass-card').querySelector('.d-flex').style.display = 'none';
+      document.getElementById('resultsSection').style.display = 'block';
+
+      document.getElementById('scoreNumber').textContent = Math.round(data.score);
+      document.getElementById('gradeLabel').textContent = data.grade;
+      document.getElementById('feedbackText').textContent = data.feedback;
+
+      const strengthsList = document.getElementById('strengthsList');
+      (data.strengths || []).forEach(s => {
+        const li = document.createElement('li'); li.textContent = s; strengthsList.appendChild(li);
+      });
+
+      const gapsList = document.getElementById('gapsList');
+      (data.gaps || []).forEach(g => {
+        const li = document.createElement('li'); li.textContent = g; gapsList.appendChild(li);
+      });
+
+      const recList = document.getElementById('recommendationsList');
+      (data.recommendations || []).forEach(r => {
+        const li = document.createElement('li'); li.textContent = r; recList.appendChild(li);
+      });
+    } catch (e) {
+      submitBtn.innerHTML = '<i class="bi bi-cpu"></i> Submit & Get AI Evaluation';
+      submitBtn.disabled = false;
+    }
+  }
+</script>
+{% endif %}
+{% endblock %}

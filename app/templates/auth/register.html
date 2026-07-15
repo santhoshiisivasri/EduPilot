@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Account – EduPilot</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+  <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" />
+</head>
+<body>
+<div class="auth-page">
+  <div class="hero-bg-orb orb-1" style="width:400px;height:400px;background:rgba(108,99,255,0.3);top:-100px;left:-100px;"></div>
+  <div class="hero-bg-orb orb-2" style="width:350px;height:350px;background:rgba(255,107,157,0.25);bottom:-50px;right:-50px;animation-delay:-3s;"></div>
+
+  <div class="auth-card position-relative">
+    <!-- Brand -->
+    <div class="text-center mb-4">
+      <a href="{{ url_for('main.index') }}" class="text-decoration-none d-inline-flex align-items-center gap-2 mb-3">
+        <div style="width:48px;height:48px;background:var(--gradient-primary);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:white;box-shadow:0 8px 25px rgba(108,99,255,0.4);">
+          <i class="bi bi-mortarboard-fill"></i>
+        </div>
+        <span style="font-family:var(--font-display);font-size:1.5rem;font-weight:800;color:white;">EduPilot</span>
+      </a>
+      <h1 class="auth-title">Create Your Account</h1>
+      <p class="auth-subtitle">Join thousands of learners building their tech careers with AI</p>
+    </div>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div style="background:rgba({{ '255,71,87' if category=='danger' else '46,213,115' }},0.1);border:1px solid rgba({{ '255,71,87' if category=='danger' else '46,213,115' }},0.3);border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:.85rem;color:{{ '#FF4757' if category=='danger' else '#2ED573' }};">
+            <i class="bi bi-{{ 'x-circle' if category=='danger' else 'check-circle' }}-fill me-2"></i>{{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('auth.register') }}">
+      <div class="form-floating-custom">
+        <label for="full_name">Full Name</label>
+        <input type="text" id="full_name" name="full_name" class="form-control" placeholder="John Doe" value="{{ full_name or '' }}" required />
+      </div>
+
+      <div class="form-floating-custom">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" class="form-control" placeholder="johndev" value="{{ username or '' }}" required minlength="3" />
+      </div>
+
+      <div class="form-floating-custom">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" class="form-control" placeholder="john@example.com" value="{{ email or '' }}" required />
+      </div>
+
+      <div class="form-floating-custom">
+        <label for="password">Password</label>
+        <div style="position:relative;">
+          <input type="password" id="password" name="password" class="form-control" placeholder="At least 8 characters" required minlength="8" style="padding-right:48px;" />
+          <button type="button" onclick="togglePwd('password','eyeBtn1')"
+                  id="eyeBtn1"
+                  style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,0.4);cursor:pointer;font-size:1rem;">
+            <i class="bi bi-eye"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="form-floating-custom">
+        <label for="confirm_password">Confirm Password</label>
+        <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="Repeat password" required />
+      </div>
+
+      <div style="margin-bottom:20px;display:flex;align-items:flex-start;gap:10px;">
+        <input type="checkbox" id="terms" required style="margin-top:3px;accent-color:var(--primary);" />
+        <label for="terms" style="color:rgba(255,255,255,0.6);font-size:.8rem;cursor:pointer;">
+          I agree to EduPilot's <a href="#" style="color:var(--primary);">Terms of Service</a> and <a href="#" style="color:var(--primary);">Privacy Policy</a>
+        </label>
+      </div>
+
+      <button type="submit" class="btn-gradient w-100" style="padding:14px;font-size:1rem;justify-content:center;">
+        <i class="bi bi-rocket-takeoff"></i>
+        Create Account & Start Learning
+      </button>
+    </form>
+
+    <div style="text-align:center;margin-top:24px;border-top:1px solid rgba(255,255,255,0.1);padding-top:20px;">
+      <p style="color:rgba(255,255,255,0.5);font-size:.85rem;margin:0;">
+        Already have an account?
+        <a href="{{ url_for('auth.login') }}" style="color:var(--primary);font-weight:600;">Sign in →</a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  function togglePwd(inputId, btnId) {
+    const input = document.getElementById(inputId);
+    const btn = document.getElementById(btnId);
+    if (input.type === 'password') {
+      input.type = 'text';
+      btn.innerHTML = '<i class="bi bi-eye-slash"></i>';
+    } else {
+      input.type = 'password';
+      btn.innerHTML = '<i class="bi bi-eye"></i>';
+    }
+  }
+</script>
+</body>
+</html>

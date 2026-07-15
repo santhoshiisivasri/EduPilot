@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% block title %}Admin Panel – EduPilot{% endblock %}
+{% block page_title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+
+  <!-- Admin Stats -->
+  <div class="col-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(108,99,255,0.1);color:var(--primary);"><i class="bi bi-people"></i></div>
+      <div class="stat-body">
+        <div class="stat-value">{{ total_users }}</div>
+        <div class="stat-label">Total Students</div>
+        <div class="stat-change positive"><i class="bi bi-arrow-up-right"></i> +{{ weekly_signups }} this week</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(46,213,115,0.1);color:#2ED573;"><i class="bi bi-chat-dots"></i></div>
+      <div class="stat-body">
+        <div class="stat-value">{{ total_messages }}</div>
+        <div class="stat-label">AI Messages</div>
+        <div class="stat-change positive"><i class="bi bi-lightning"></i> {{ today_msgs }} today</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(255,179,71,0.1);color:#FFB347;"><i class="bi bi-map"></i></div>
+      <div class="stat-body">
+        <div class="stat-value">{{ total_roadmaps }}</div>
+        <div class="stat-label">Roadmaps Generated</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(255,107,157,0.1);color:#FF6B9D;"><i class="bi bi-clipboard-check"></i></div>
+      <div class="stat-body">
+        <div class="stat-value">{{ total_assessments }}</div>
+        <div class="stat-label">Assessments Taken</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IBM Watsonx Status -->
+  <div class="col-lg-4">
+    <div class="glass-card h-100" style="background:linear-gradient(135deg,rgba(26,42,108,0.9),rgba(63,43,150,0.9));border:1px solid rgba(108,99,255,0.3);">
+      <div class="glass-card-body" style="color:white;">
+        <div style="font-size:1.8rem;margin-bottom:12px;">🔵</div>
+        <h3 style="font-family:var(--font-display);font-weight:800;margin-bottom:16px;">IBM Watsonx.ai Status</h3>
+        {% for label, value in [
+          ('Model', 'granite-4-h-small'),
+          ('Region', 'us-south'),
+          ('Total AI Calls', total_messages|string),
+          ('Avg Response', '~2.3s'),
+        ] %}
+        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.1);font-size:.85rem;">
+          <span style="opacity:.7;">{{ label }}</span>
+          <span style="font-weight:600;">{{ value }}</span>
+        </div>
+        {% endfor %}
+        <div style="margin-top:16px;display:flex;align-items:center;gap:8px;">
+          <div style="width:10px;height:10px;background:#2ED573;border-radius:50%;animation:pulse-glow 2s infinite;"></div>
+          <span style="color:#2ED573;font-weight:600;font-size:.875rem;">All Systems Operational</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Users -->
+  <div class="col-lg-8">
+    <div class="glass-card">
+      <div class="glass-card-body">
+        <div class="section-title mb-4">
+          <div class="title-icon"><i class="bi bi-people"></i></div>
+          Recent Students
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Email</th>
+                <th>Joined</th>
+                <th>Profile</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for user in recent_users %}
+              <tr>
+                <td>
+                  <div style="display:flex;align-items:center;gap:10px;">
+                    <div style="width:32px;height:32px;border-radius:50%;background:var(--gradient-primary);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:.8rem;flex-shrink:0;">
+                      {{ (user.profile.full_name or user.username)[0].upper() }}
+                    </div>
+                    <div>
+                      <div style="font-weight:600;font-size:.85rem;">{{ user.profile.full_name or user.username }}</div>
+                      <div style="font-size:.72rem;color:var(--text-muted);">@{{ user.username }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td style="font-size:.82rem;color:var(--text-muted);">{{ user.email }}</td>
+                <td style="font-size:.82rem;color:var(--text-muted);">{{ user.created_at.strftime('%b %d, %Y') if user.created_at else 'N/A' }}</td>
+                <td>
+                  {% set pct = user.profile.completion_percentage() if user.profile else 0 %}
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <div class="progress-bar-custom" style="width:60px;height:5px;">
+                      <div class="progress-bar-fill" style="width:{{ pct }}%;height:100%;"></div>
+                    </div>
+                    <span style="font-size:.75rem;color:var(--text-muted);">{{ pct }}%</span>
+                  </div>
+                </td>
+                <td>
+                  <span style="background:rgba(46,213,115,0.1);color:#2ED573;font-size:.7rem;font-weight:600;padding:3px 8px;border-radius:20px;">Active</span>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Platform Analytics -->
+  <div class="col-12">
+    <div class="glass-card">
+      <div class="glass-card-body">
+        <div class="section-title mb-4">
+          <div class="title-icon"><i class="bi bi-graph-up"></i></div>
+          Platform Analytics
+        </div>
+        <canvas id="adminChart" height="150"></canvas>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+fetch('/admin/analytics')
+  .then(r => r.json())
+  .then(data => {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const textColor = isDark ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)';
+
+    const ctx = document.getElementById('adminChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: (data.domain_popularity || []).map(d => d.domain),
+        datasets: [{
+          label: 'Roadmaps Generated',
+          data: (data.domain_popularity || []).map(d => d.count),
+          backgroundColor: 'rgba(108,99,255,0.7)',
+          borderColor: '#6C63FF',
+          borderWidth: 2,
+          borderRadius: 8,
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { ticks: { color: textColor } },
+          y: { ticks: { color: textColor }, beginAtZero: true }
+        }
+      }
+    });
+  });
+</script>
+{% endblock %}

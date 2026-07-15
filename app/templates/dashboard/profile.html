@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+{% block title %}Profile – EduPilot{% endblock %}
+{% block page_title %}My Profile{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+  {% if is_setup %}
+  <div class="col-12">
+    <div style="background:var(--gradient-primary);border-radius:var(--radius);padding:24px 28px;color:white;margin-bottom:8px;">
+      <h2 style="font-family:var(--font-display);font-weight:800;font-size:1.4rem;margin-bottom:4px;">🎉 Welcome to EduPilot!</h2>
+      <p style="color:rgba(255,255,255,0.85);margin:0;font-size:.9rem;">Complete your profile to get your personalized AI learning roadmap. Takes just 2 minutes!</p>
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="col-lg-4">
+    <div class="glass-card mb-4">
+      <div class="glass-card-body text-center">
+        <!-- Avatar -->
+        <div style="width:90px;height:90px;border-radius:50%;background:var(--gradient-primary);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:2.5rem;font-weight:700;color:white;box-shadow:0 8px 25px rgba(108,99,255,0.4);">
+          {{ (current_user.profile.full_name or current_user.username)[0].upper() }}
+        </div>
+        <h3 style="font-family:var(--font-display);font-weight:800;margin-bottom:4px;">
+          {{ current_user.profile.full_name if current_user.profile and current_user.profile.full_name else current_user.username }}
+        </h3>
+        <div style="color:var(--text-muted);font-size:.85rem;margin-bottom:16px;">{{ current_user.email }}</div>
+
+        <!-- Profile Completion -->
+        {% set completion = current_user.profile.completion_percentage() if current_user.profile else 0 %}
+        <div style="margin-bottom:16px;">
+          <div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:6px;">
+            <span style="color:var(--text-muted);">Profile Completion</span>
+            <span style="color:var(--primary);font-weight:700;">{{ completion }}%</span>
+          </div>
+          <div class="progress-bar-custom">
+            <div class="progress-bar-fill" style="width:{{ completion }}%;"></div>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-center gap-3">
+          <div style="text-align:center;">
+            <div style="font-family:var(--font-display);font-size:1.4rem;font-weight:800;color:var(--primary);">{{ current_user.achievements.count() }}</div>
+            <div style="font-size:.72rem;color:var(--text-muted);">Badges</div>
+          </div>
+          <div style="width:1px;background:var(--border);"></div>
+          <div style="text-align:center;">
+            <div style="font-family:var(--font-display);font-size:1.4rem;font-weight:800;color:var(--primary);">{{ current_user.roadmaps.count() }}</div>
+            <div style="font-size:.72rem;color:var(--text-muted);">Roadmaps</div>
+          </div>
+          <div style="width:1px;background:var(--border);"></div>
+          <div style="text-align:center;">
+            <div style="font-family:var(--font-display);font-size:1.4rem;font-weight:800;color:var(--primary);">{{ current_user.assessments.count() }}</div>
+            <div style="font-size:.72rem;color:var(--text-muted);">Assessments</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% if current_user.profile and current_user.profile.skills_list %}
+    <div class="glass-card">
+      <div class="glass-card-body">
+        <div style="font-size:.875rem;font-weight:700;margin-bottom:12px;">Current Skills</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          {% for skill in current_user.profile.skills_list %}
+          <span class="skill-tag">{{ skill }}</span>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="col-lg-8">
+    <div class="glass-card">
+      <div class="glass-card-body">
+        <div class="section-title mb-4">
+          <div class="title-icon"><i class="bi bi-pencil-square"></i></div>
+          {{ 'Setup Your Profile' if is_setup else 'Edit Profile' }}
+        </div>
+
+        <form action="{{ url_for('profile.update') }}" method="POST" enctype="multipart/form-data">
+          {% if is_setup %}
+          <input type="hidden" name="is_setup" value="1" />
+          {% endif %}
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label style="font-size:.8rem;font-weight:600;color:var(--text-muted);margin-bottom:6px;display:block;">Full Name *</label>
+              <input type="text" name="full_name" class="form-control"
+                     style="background:var(--bg-glass);border:1px solid var(--border);border-radius:12px;padding:10px 16px;color:var(--text);"
+                     placeholder="Your full name"
+                     value="{{ current_user.profile.full_name or '' if current_user.profile else '' }}" required />
+            </div>
+
+            <div class="col-md-6">
+              <label style="font-size:.8rem;font-weight:600;color:var(--text-muted);margin-bottom:6px;display:block;">Education</label>
+              <input type="text" name="education" class="form-control"
+                     style="background:var(--bg-glass);border:1px solid var(--border);border-radius:12px;padding:10px 16px;color:var(--text);"
+                     placeholder="e.g. B.Tech CSE, Self-taught"
+                     value="{{ current_user.profile.education or '' if current_user.profile else '' }}" />
+            </div>
+
+            <div class="col-md-6">
+              <label style="font-size:.8rem;font-weight:600;color:var(--text-muted);margin-bottom:6px;display:block;">Institution</label>
+              <input type="text" name="institution"
+                     style="background:var(--bg-glass);border:1px solid var(--border);border-radius:12px;padding:10px 16px;color:var(--text);width:100%;outline:none;"
+                     placeholder="College / University"
+                     value="{{ current_user.profile.institution or '' if current_user.profile else '' }}" />
+            </div>
+
+            <div class="col-md-6">
+              <label style="font-size:.8rem;font-weight:600;color:var(--text-muted);margin-bottom:6px;display:block;">Graduation Year</label>
+              <input type="number" name="graduation_year"
+                     style="background:var(--bg-glass);border:1px solid var(--border);border-radius:12px;padding:10px 16px;color:var(--text);width:100%;outline:none;"
+                     placeholder="e.g. 2025"
+                     value="{{ current_user.profile.graduation_year or '' if current_user.profile else '' }}" />
+            </div>
+
+            <div class="col-12">
+              <label style="font-size:.8rem;font-weight:600;color:var(--text-muted);margin-bottom:6px;display:block;">Career Goal *</label>
+              <input type="text" name="career_goal"
+                     style="background:var(--bg-glass);border:1px solid var(--border);border-radius:12px;padding:10px 16px;color:var(--text);width:100%;outline:none;"
+                     placeholder="e.g. Full Stack Developer at a tech startup"
+                     value="{{ current_user.profile.career_goal or '' if current_user.profile else '' }}" required />
+            </div>
+
+            <div class="col-md-6">
+              <label style="font-size:.8rem;font-weight:600;color:var(--text-muted);margin-bottom:6px;display:block;">Preferred Domain</label>
+              <select name="preferred_domain"
+                      style="background:var(--bg-glass);border:1px solid var(--border);border-radius:12px;padding:10px 16px;color:var(--text);width:100%;outline:none;">
+                <option value="">Select domain</option>
+                {% for domain in career_domains %}
+                <option value="{{ domain.id }}" {% if current_user.profile and current_user.profile.preferred_domain == domain.id %}selected{% endif %}>{{ domain.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label style="font-size:.8rem;font-weight:600;color:var(--text-muted);margin-bottom:6px;display:block;">Experience Level</label>
+              <select name="experience_level"
+                      style="background:var(--bg-glass);border:1px solid var(--border);border-radius:12px;padding:10px 16px;color:var(--text);width:100%;outline:none;">
+                {% for val, label in experience_levels %}
+                <option value="{{ val }}" {% if current_user.profile and current_user.profile.experience_level == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label style="font-size:.8rem;font-weight:600;color:var(--text-muted);margin-bottom:6px;display:block;">Learning Style</label>
+              <select name="learning_style"
+                      style="background:var(--bg-glass);border:1px solid var(--border);border-radius:12px;padding:10px 16px;color:var(--text);width:100%;outline:none;">
+                <option value="">Select style</option>
+                {% for val, label in learning_styles %}
+                <option value="{{ val }}" {% if current_user.profile and current_user.profile.learning_style == val %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label style="font-size:.8rem;font-weight:600;color:var(--text-muted);margin-bottom:6px;display:block;">
+                Study Hours per Week: <span id="hoursLabel">{{ current_user.profile.study_hours_per_week or 10 if current_user.profile else 10 }}</span>h
+              </label>
+              <input type="range" name="study_hours_per_week" min="1" max="40" step="1"
+                     value="{{ current_user.profile.study_hours_per_week or 10 if current_user.profile else 10 }}"
+                     oninput="document.getElementById('hoursLabel').textContent=this.value"
+                     style="width:100%;accent-color:var(--primary);" />
+              <div style="display:flex;justify-content:space-between;font-size:.7rem;color:var(--text-muted);">
+                <span>1h</span><span>40h</span>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <label style="font-size:.8rem;font-weight:600;color:var(--text-muted);margin-bottom:6px;display:block;">Current Skills (comma-separated)</label>
+              <input type="text" name="skills"
+                     style="background:var(--bg-glass);border:1px solid var(--border);border-radius:12px;padding:10px 16px;color:var(--text);width:100%;outline:none;"
+                     placeholder="e.g. Python, HTML, CSS, JavaScript"
+                     value="{{ ', '.join(current_user.profile.skills_list) if current_user.profile else '' }}" />
+            </div>
+
+            <div class="col-12">
+              <label style="font-size:.8rem;font-weight:600;color:var(--text-muted);margin-bottom:6px;display:block;">Interests (comma-separated)</label>
+              <input type="text" name="interests"
+                     style="background:var(--bg-glass);border:1px solid var(--border);border-radius:12px;padding:10px 16px;color:var(--text);width:100%;outline:none;"
+                     placeholder="e.g. AI, gaming, mobile apps, cybersecurity"
+                     value="{{ ', '.join(current_user.profile.interests_list) if current_user.profile else '' }}" />
+            </div>
+
+            <div class="col-12">
+              <label style="font-size:.8rem;font-weight:600;color:var(--text-muted);margin-bottom:6px;display:block;">Bio</label>
+              <textarea name="bio" rows="3"
+                        style="background:var(--bg-glass);border:1px solid var(--border);border-radius:12px;padding:10px 16px;color:var(--text);width:100%;outline:none;resize:vertical;"
+                        placeholder="Tell us about yourself...">{{ current_user.profile.bio or '' if current_user.profile else '' }}</textarea>
+            </div>
+
+            <div class="col-12">
+              <button type="submit" class="btn-gradient" style="padding:12px 36px;font-size:.95rem;">
+                <i class="bi bi-check-lg"></i>
+                {{ 'Complete Setup & Start Learning!' if is_setup else 'Save Profile' }}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

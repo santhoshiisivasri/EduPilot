@@ -1,0 +1,18 @@
+# EduPilot – .gitignore
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+*.db
+*.sqlite3
+instance/
+migrations/
+.pytest_cache/
+dist/
+build/
+*.egg-info/
+app/static/uploads/
+.DS_Store
+Thumbs.db

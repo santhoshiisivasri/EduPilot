@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% block title %}Analytics – EduPilot{% endblock %}
+{% block page_title %}Learning Analytics{% endblock %}
+
+{% block content %}
+<div class="row g-4" id="analyticsPage">
+
+  <!-- Stat Cards (loaded via JS) -->
+  <div class="col-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(108,99,255,0.1);color:var(--primary);"><i class="bi bi-chat-dots"></i></div>
+      <div class="stat-body">
+        <div class="stat-value" id="totalMessages">–</div>
+        <div class="stat-label">AI Messages Sent</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(46,213,115,0.1);color:#2ED573;"><i class="bi bi-check2-all"></i></div>
+      <div class="stat-body">
+        <div class="stat-value" id="totalMilestones">–</div>
+        <div class="stat-label">Milestones Completed</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(255,179,71,0.1);color:#FFB347;"><i class="bi bi-clipboard-check"></i></div>
+      <div class="stat-body">
+        <div class="stat-value" id="totalAssessments">–</div>
+        <div class="stat-label">Assessments Taken</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(255,107,157,0.1);color:#FF6B9D;"><i class="bi bi-graph-up"></i></div>
+      <div class="stat-body">
+        <div class="stat-value" id="avgScore">–</div>
+        <div class="stat-label">Avg. Assessment Score</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Weekly Study Hours Chart -->
+  <div class="col-lg-8">
+    <div class="glass-card h-100">
+      <div class="glass-card-body">
+        <div class="section-title mb-4">
+          <div class="title-icon"><i class="bi bi-bar-chart-line"></i></div>
+          Weekly Study Activity
+        </div>
+        <canvas id="weeklyChart" height="250"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Day of Week Activity -->
+  <div class="col-lg-4">
+    <div class="glass-card h-100">
+      <div class="glass-card-body">
+        <div class="section-title mb-4">
+          <div class="title-icon"><i class="bi bi-calendar3"></i></div>
+          Activity by Day
+        </div>
+        <canvas id="dayChart" height="250"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Assessment Scores -->
+  <div class="col-lg-6">
+    <div class="glass-card">
+      <div class="glass-card-body">
+        <div class="section-title mb-4">
+          <div class="title-icon"><i class="bi bi-activity"></i></div>
+          Assessment Scores
+        </div>
+        <canvas id="assessmentChart" height="220"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Milestone Progress by Level -->
+  <div class="col-lg-6">
+    <div class="glass-card">
+      <div class="glass-card-body">
+        <div class="section-title mb-4">
+          <div class="title-icon"><i class="bi bi-pie-chart"></i></div>
+          Milestones by Level
+        </div>
+        <canvas id="milestoneChart" height="220"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Career Readiness -->
+  <div class="col-12">
+    <div class="glass-card">
+      <div class="glass-card-body">
+        <div class="section-title mb-4">
+          <div class="title-icon" style="background:var(--gradient-warm);"><i class="bi bi-trophy"></i></div>
+          Career Readiness Score
+        </div>
+        <div class="row align-items-center">
+          <div class="col-md-4 text-center">
+            <div id="readinessDisplay" style="font-family:var(--font-display);font-size:5rem;font-weight:900;background:var(--gradient-primary);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;">–</div>
+            <div style="font-size:.875rem;color:var(--text-muted);">Overall Career Readiness</div>
+          </div>
+          <div class="col-md-8">
+            {% for label, key, max_val, color in [
+              ('Profile Completion', 'profile', 15, 'var(--primary)'),
+              ('Assessments', 'assessment', 25, '#FFB347'),
+              ('Milestones Done', 'milestones', 30, '#2ED573'),
+            ] %}
+            <div style="margin-bottom:14px;">
+              <div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:4px;">
+                <span style="color:var(--text-secondary);">{{ label }}</span>
+                <span style="color:{{ color }};font-weight:600;">/ {{ max_val }} pts</span>
+              </div>
+              <div class="progress-bar-custom">
+                <div class="progress-bar-fill" style="background:{{ color }};width:{{ (50 * 100 // max_val) }}%;"></div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+{% endblock %}

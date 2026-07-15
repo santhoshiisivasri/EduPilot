@@ -1,0 +1,311 @@
+{% extends 'base.html' %}
+{% block title %}My Roadmap – EduPilot{% endblock %}
+{% block page_title %}Learning Roadmap{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+
+  <!-- Generate New Roadmap -->
+  <div class="col-12">
+    <div class="glass-card">
+      <div class="glass-card-body">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+          <div>
+            <div class="section-title mb-1">
+              <div class="title-icon"><i class="bi bi-magic"></i></div>
+              Generate AI Roadmap
+            </div>
+            <p style="color:var(--text-muted);font-size:.85rem;margin:0;">Choose a career domain and let IBM Granite AI build your personalized path.</p>
+          </div>
+          <button class="btn-gradient" onclick="document.getElementById('generatePanel').classList.toggle('d-none')" style="padding:10px 22px;">
+            <i class="bi bi-plus-circle"></i> New Roadmap
+          </button>
+        </div>
+
+        <div id="generatePanel" class="d-none mt-4 pt-4" style="border-top:1px solid var(--border);">
+          <form action="{{ url_for('roadmap.generate') }}" method="POST">
+            <div class="row g-3 align-items-end">
+              <div class="col-md-9">
+                <label style="font-size:.8rem;font-weight:600;color:var(--text-muted);margin-bottom:6px;display:block;">Select Career Domain</label>
+                <select name="domain" class="form-select" style="background:var(--bg-glass);border:1px solid var(--border);color:var(--text);border-radius:12px;padding:10px 16px;">
+                  <option value="">-- Choose your domain --</option>
+                  {% for domain in career_domains %}
+                  <option value="{{ domain.name }}" {% if roadmap and roadmap.domain == domain.name %}selected{% endif %}>
+                    {{ domain.name }} – {{ domain.avg_salary }}
+                  </option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-md-3">
+                <button type="submit" class="btn-gradient w-100" style="justify-content:center;padding:10px;">
+                  <i class="bi bi-cpu"></i> Generate with AI
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if roadmap %}
+  <!-- Roadmap Stats -->
+  <div class="col-md-4">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(108,99,255,0.1);color:var(--primary);"><i class="bi bi-map"></i></div>
+      <div class="stat-body">
+        <div class="stat-value">{{ roadmap.completion_percentage() }}%</div>
+        <div class="stat-label">Overall Progress</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(46,213,115,0.1);color:#2ED573;"><i class="bi bi-check2-all"></i></div>
+      <div class="stat-body">
+        <div class="stat-value">{{ roadmap.milestones.filter_by(completed=True).count() }}</div>
+        <div class="stat-label">Milestones Completed</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="stat-card">
+      <div class="stat-icon" style="background:rgba(255,107,157,0.1);color:#FF6B9D;"><i class="bi bi-layers"></i></div>
+      <div class="stat-body">
+        <div class="stat-value">{{ roadmap.milestones.count() }}</div>
+        <div class="stat-label">Total Milestones</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Roadmap Header -->
+  <div class="col-12">
+    <div class="glass-card">
+      <div class="glass-card-body">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+          <div>
+            <h2 style="font-family:var(--font-display);font-size:1.4rem;font-weight:800;">{{ roadmap.title }}</h2>
+            <div class="d-flex align-items-center gap-2 mt-1">
+              <span style="background:rgba(108,99,255,0.1);color:var(--primary);font-size:.75rem;font-weight:600;padding:4px 10px;border-radius:20px;">{{ roadmap.domain }}</span>
+              <span style="background:rgba(46,213,115,0.1);color:#2ED573;font-size:.75rem;font-weight:600;padding:4px 10px;border-radius:20px;">{{ roadmap.status | title }}</span>
+              <span style="color:var(--text-muted);font-size:.75rem;">Generated {{ roadmap.generated_at.strftime('%b %d, %Y') if roadmap.generated_at else '' }}</span>
+            </div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-family:var(--font-display);font-size:2rem;font-weight:900;color:var(--primary);">{{ roadmap.completion_percentage() }}%</div>
+            <div class="progress-bar-custom" style="width:120px;height:8px;margin-left:auto;">
+              <div class="progress-bar-fill" style="width:{{ roadmap.completion_percentage() }}%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Roadmap Timeline -->
+  {% for level_name, level_icon, level_color, bg_color in [
+    ('beginner', 'bi-seedling', '#2ED573', 'rgba(46,213,115,0.08)'),
+    ('intermediate', 'bi-lightning-charge', '#6C63FF', 'rgba(108,99,255,0.08)'),
+    ('advanced', 'bi-rocket', '#FF6B9D', 'rgba(255,107,157,0.08)')
+  ] %}
+  {% set level_milestones = grouped_milestones.get(level_name, []) %}
+  {% if level_milestones %}
+  <div class="col-12">
+    <div class="glass-card">
+      <div class="glass-card-body">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
+          <div style="width:44px;height:44px;border-radius:14px;background:{{ level_color }}22;color:{{ level_color }};display:flex;align-items:center;justify-content:center;font-size:1.3rem;">
+            <i class="bi {{ level_icon }}"></i>
+          </div>
+          <div>
+            <h3 style="font-family:var(--font-display);font-size:1.2rem;font-weight:800;margin:0;color:{{ level_color }};">{{ level_name | title }} Level</h3>
+            <div style="font-size:.75rem;color:var(--text-muted);">
+              {{ level_milestones | selectattr('completed', 'equalto', True) | list | length }}/{{ level_milestones|length }} completed
+            </div>
+          </div>
+          <!-- Level progress bar -->
+          <div style="flex:1;margin-left:auto;max-width:200px;">
+            {% set level_done = level_milestones | selectattr('completed', 'equalto', True) | list | length %}
+            {% set level_total = level_milestones | length %}
+            <div class="progress-bar-custom">
+              <div class="progress-bar-fill" style="width:{{ (level_done/level_total*100) if level_total > 0 else 0 }}%;background:{{ level_color }};"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-3">
+          {% for milestone in level_milestones %}
+          <div class="col-md-6 col-lg-4">
+            <div style="background:{{ bg_color }};border:1px solid {{ level_color }}{{ '44' if milestone.completed else '22' }};border-radius:var(--radius);padding:20px;transition:var(--transition);"
+                 onmouseover="this.style.boxShadow='var(--shadow-hover)';this.style.transform='translateY(-2px)'"
+                 onmouseout="this.style.boxShadow='';this.style.transform=''">
+
+              <!-- Milestone Header -->
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;">
+                <div style="flex:1;">
+                  <div style="font-size:.7rem;font-weight:600;color:{{ level_color }};text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">
+                    {{ level_name | title }} · {{ milestone.duration_weeks }} weeks
+                  </div>
+                  <h4 style="font-family:var(--font-display);font-size:.95rem;font-weight:700;margin:0;color:var(--text);">{{ milestone.title }}</h4>
+                </div>
+                <button
+                  onclick="toggleMilestone({{ milestone.id }}, this)"
+                  style="width:32px;height:32px;border-radius:50%;border:2px solid {{ level_color }};background:{{ 'var(--gradient-primary)' if milestone.completed else 'transparent' }};color:{{ 'white' if milestone.completed else level_color }};cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:8px;transition:var(--transition);"
+                  title="{{ 'Mark Incomplete' if milestone.completed else 'Mark Complete' }}">
+                  <i class="bi bi-check-lg"></i>
+                </button>
+              </div>
+
+              {% if milestone.description %}
+              <p style="font-size:.8rem;color:var(--text-secondary);line-height:1.6;margin-bottom:12px;">{{ milestone.description }}</p>
+              {% endif %}
+
+              <!-- Resources -->
+              {% if milestone.resources_list %}
+              <div style="margin-bottom:10px;">
+                <div style="font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">📚 Resources</div>
+                {% for resource in milestone.resources_list[:3] %}
+                <div style="font-size:.77rem;color:var(--text-secondary);padding:4px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;">
+                  <i class="bi bi-play-circle" style="color:{{ level_color }};flex-shrink:0;"></i>
+                  {{ resource }}
+                </div>
+                {% endfor %}
+              </div>
+              {% endif %}
+
+              <!-- Projects -->
+              {% if milestone.projects_list %}
+              <div style="margin-bottom:10px;">
+                <div style="font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">🛠️ Projects</div>
+                {% for project in milestone.projects_list %}
+                <div style="font-size:.77rem;color:var(--text-secondary);padding:4px 0;display:flex;align-items:center;gap:6px;">
+                  <i class="bi bi-tools" style="color:#FFB347;flex-shrink:0;"></i>
+                  {{ project }}
+                </div>
+                {% endfor %}
+              </div>
+              {% endif %}
+
+              <!-- Certifications -->
+              {% if milestone.certifications_list %}
+              <div>
+                <div style="font-size:.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">📜 Certifications</div>
+                {% for cert in milestone.certifications_list %}
+                <span style="background:{{ level_color }}22;color:{{ level_color }};font-size:.7rem;font-weight:600;padding:3px 10px;border-radius:20px;display:inline-block;margin:2px;">{{ cert }}</span>
+                {% endfor %}
+              </div>
+              {% endif %}
+
+              {% if milestone.completed %}
+              <div style="margin-top:12px;display:flex;align-items:center;gap:6px;color:#2ED573;font-size:.78rem;font-weight:600;">
+                <i class="bi bi-check-circle-fill"></i>
+                Completed {{ milestone.completed_at.strftime('%b %d, %Y') if milestone.completed_at else '' }}
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+  {% endfor %}
+
+  {% else %}
+  <!-- No Roadmap State -->
+  <div class="col-12">
+    <div class="glass-card">
+      <div class="glass-card-body text-center py-5">
+        <div style="width:100px;height:100px;background:rgba(108,99,255,0.08);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-size:3rem;">🗺️</div>
+        <h3 style="font-family:var(--font-display);font-weight:700;margin-bottom:8px;">No Roadmap Generated Yet</h3>
+        <p style="color:var(--text-muted);max-width:400px;margin:0 auto 24px;font-size:.9rem;">
+          Click "New Roadmap" above and select a career domain. IBM Granite AI will build your personalized beginner → intermediate → advanced learning path.
+        </p>
+        <button class="btn-gradient" onclick="document.getElementById('generatePanel').classList.remove('d-none');document.getElementById('generatePanel').scrollIntoView({behavior:'smooth'})">
+          <i class="bi bi-magic"></i> Generate My First Roadmap
+        </button>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- All Roadmaps -->
+  {% if all_roadmaps|length > 1 %}
+  <div class="col-12">
+    <div class="glass-card">
+      <div class="glass-card-body">
+        <div class="section-title mb-3">
+          <div class="title-icon"><i class="bi bi-archive"></i></div>
+          All Roadmaps
+        </div>
+        <div class="row g-3">
+          {% for r in all_roadmaps %}
+          <div class="col-md-6 col-lg-4">
+            <a href="{{ url_for('roadmap.view', roadmap_id=r.id) }}" class="text-decoration-none">
+              <div style="background:var(--bg-glass);border:1px solid var(--border);border-radius:12px;padding:16px;transition:var(--transition);"
+                   onmouseover="this.style.borderColor='var(--primary)'"
+                   onmouseout="this.style.borderColor='var(--border)'">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                  <span style="font-size:.85rem;font-weight:700;color:var(--text);">{{ r.domain }}</span>
+                  <span style="font-size:.7rem;padding:3px 8px;border-radius:20px;background:{{ 'rgba(46,213,115,0.1)' if r.status=='active' else 'rgba(108,99,255,0.1)' }};color:{{ '#2ED573' if r.status=='active' else 'var(--primary)' }};font-weight:600;">
+                    {{ r.status | title }}
+                  </span>
+                </div>
+                <div class="progress-bar-custom">
+                  <div class="progress-bar-fill" style="width:{{ r.completion_percentage() }}%;"></div>
+                </div>
+                <div style="font-size:.75rem;color:var(--text-muted);margin-top:6px;">{{ r.completion_percentage() }}% complete · {{ r.generated_at.strftime('%b %Y') if r.generated_at else '' }}</div>
+              </div>
+            </a>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function toggleMilestone(milestoneId, btn) {
+  try {
+    btn.innerHTML = '<div class="spinner" style="width:14px;height:14px;border-width:2px;"></div>';
+    const resp = await fetch(`/roadmap/milestone/${milestoneId}/toggle`, { method: 'POST' });
+    const data = await resp.json();
+
+    btn.innerHTML = '<i class="bi bi-check-lg"></i>';
+    if (data.completed) {
+      btn.style.background = 'var(--gradient-primary)';
+      btn.style.color = 'white';
+      btn.closest('[style*="border"]').style.opacity = '0.85';
+    } else {
+      btn.style.background = 'transparent';
+      btn.style.color = '';
+    }
+
+    // Show toast
+    showToast(data.completed ? `✅ Milestone completed! Progress: ${data.progress}%` : '↩️ Milestone marked incomplete', data.completed ? 'success' : 'info');
+  } catch (e) {
+    btn.innerHTML = '<i class="bi bi-check-lg"></i>';
+    showToast('Error updating milestone', 'danger');
+  }
+}
+
+function showToast(msg, type) {
+  const toast = document.createElement('div');
+  toast.className = `flash-message ${type}`;
+  toast.innerHTML = `<span style="flex:1;font-size:.875rem;color:var(--text);">${msg}</span>`;
+  toast.style.position = 'fixed';
+  toast.style.top = '80px';
+  toast.style.right = '20px';
+  toast.style.zIndex = '9999';
+  toast.style.maxWidth = '380px';
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 4000);
+}
+</script>
+{% endblock %}
