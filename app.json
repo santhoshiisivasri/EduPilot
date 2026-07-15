@@ -1,0 +1,84 @@
+{
+  "name": "EduPilot",
+  "description": "AI-Powered Education Platform built with Flask and IBM Watsonx.ai",
+  "repository": "https://github.com/santhoshiisivasri/EduPilot",
+  "logo": "",
+  "keywords": ["python", "flask", "education", "ai", "watsonx"],
+  "stack": "python",
+  "scripts": {
+    "build": "pip install -r requirements.txt"
+  },
+  "env": {
+    "SECRET_KEY": {
+      "description": "Flask secret key for session security",
+      "generator": "secret"
+    },
+    "FLASK_ENV": {
+      "description": "Flask environment mode",
+      "value": "production"
+    },
+    "FLASK_DEBUG": {
+      "description": "Enable/disable Flask debug mode",
+      "value": "False"
+    },
+    "IBM_API_KEY": {
+      "description": "IBM Watsonx.ai API key",
+      "required": true
+    },
+    "IBM_PROJECT_ID": {
+      "description": "IBM Watsonx.ai project ID",
+      "required": true
+    },
+    "IBM_REGION": {
+      "description": "IBM Cloud region",
+      "value": "us-south"
+    },
+    "WATSONX_MODEL_ID": {
+      "description": "Watsonx AI model identifier",
+      "value": "ibm/granite-3-8b-instruct"
+    },
+    "APP_NAME": {
+      "description": "Application name",
+      "value": "EduPilot"
+    },
+    "MAX_CHAT_HISTORY": {
+      "description": "Maximum chat history entries",
+      "value": "50"
+    },
+    "MAX_TOKENS": {
+      "description": "Maximum tokens for AI responses",
+      "value": "2048"
+    },
+    "TEMPERATURE": {
+      "description": "AI response temperature",
+      "value": "0.7"
+    },
+    "ADMIN_EMAIL": {
+      "description": "Default admin email",
+      "value": "admin@edupilot.ai"
+    },
+    "ADMIN_PASSWORD": {
+      "description": "Default admin password",
+      "required": true
+    },
+    "DATABASE_URL": {
+      "description": "PostgreSQL database connection string",
+      "required": true
+    },
+    "PYTHON_VERSION": {
+      "description": "Python runtime version",
+      "value": "3.11.9"
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "free"
+    }
+  },
+  "buildpacks": [
+    {
+      "url": "heroku/python"
+    }
+  ]
+}
